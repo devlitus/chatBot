@@ -1,4 +1,7 @@
 import { useChatStore } from "@/stores/chat";
+import ReactMarkdown from "react-markdown";
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 export function Chat() {
   const { messages } = useChatStore();
@@ -21,7 +24,43 @@ export function Chat() {
                     : 'bg-[var(--color-accent)] text-[var(--color-text-inverse)]'
                 }`}
               >
-                {message.content}
+                {message.role === 'assistant' ? (
+                  <div className="prose prose-invert max-w-none">
+                    <ReactMarkdown
+                      components={{
+                        ul: ({children}) => <ul className="list-disc ml-4 space-y-1">{children}</ul>,
+                        li: ({children}) => <li className="marker:text-[var(--color-text-primary)]">{children}</li>,
+                        strong: ({children}) => <strong className="font-semibold text-[var(--color-text-primary)]">{children}</strong>,
+                        p: ({children}) => <p className="mb-2 last:mb-0">{children}</p>,
+                        code: ({node, inline, className, children, ...props}) => {
+                          const match = /language-(\w+)/.exec(className || '');
+                          const language = match ? match[1] : '';
+                          
+                          return !inline && language ? (
+                            <div className="rounded-md overflow-hidden my-2">
+                              <SyntaxHighlighter
+                                style={vscDarkPlus}
+                                language={language}
+                                PreTag="div"
+                                {...props}
+                              >
+                                {String(children).replace(/\n$/, '')}
+                              </SyntaxHighlighter>
+                            </div>
+                          ) : (
+                            <code className="bg-[var(--color-bg-primary)] px-1 py-0.5 rounded text-sm" {...props}>
+                              {children}
+                            </code>
+                          )
+                        }
+                      }}
+                    >
+                      {message.content}
+                    </ReactMarkdown>
+                  </div>
+                ) : (
+                  message.content
+                )}
               </div>
             </div>
           ))}
