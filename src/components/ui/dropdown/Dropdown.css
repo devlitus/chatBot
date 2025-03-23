@@ -1,0 +1,79 @@
+.dropdown {
+  position: relative;
+  width: 100%;
+  font-family: var(--font-family);
+}
+
+.dropdown.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.dropdown-trigger {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-md);
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+
+.dropdown-arrow {
+  transition: transform 0.2s ease-in-out;
+}
+
+.dropdown-arrow.open {
+  transform: rotate(180deg);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background-color: var(--color-surface);
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+.dropdown-item {
+  width: 100%;
+  background: none;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-xs);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.dropdown-item:hover {
+  background-color: var(--color-purple-dark);
+}
+
+.dropdown-item.selected {
+  background-color: var(--color-primary);
+  color: var(--color-text-primary);
+}
+
+/* Scrollbar styling */
+.dropdown-menu::-webkit-scrollbar {
+  width: 8px;
+}
+
+.dropdown-menu::-webkit-scrollbar-track {
+  background: var(--color-surface);
+}
+
+.dropdown-menu::-webkit-scrollbar-thumb {
+  background: var(--color-purple);
+}
+
+.dropdown-menu::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent);
+}

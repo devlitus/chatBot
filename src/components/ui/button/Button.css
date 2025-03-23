@@ -1,0 +1,43 @@
+.button {
+  font-family: var(--font-family);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Variants */
+.button.primary {
+  background-color: transparent;
+  color: var(--color-text-primary);
+  border: solid 1px var(--color-primary);
+  border-radius: 10px;
+}
+
+.button.primary:hover {
+  color: var(--color-accent);
+}
+
+.button.secondary {
+  background-color: transparent;
+  color: var(--color-text-primary);
+}
+
+.button.secondary:hover {
+  color: var(--color-accent);
+}
+
+/* Sizes */
+.button.sm {
+  padding: 0.5rem 1rem;
+  font-size: var(--font-size-sm);
+}
+
+.button.md {
+  padding: 0.75rem 1.5rem;
+  font-size: var(--font-size-md);
+}
+
+.button.lg {
+  padding: 1rem 2rem;
+  font-size: var(--font-size-lg);
+}
