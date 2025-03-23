@@ -18,10 +18,10 @@ export function useMessage() {
         model: selectedModel,
         messages: [{
           role: 'user',
-          content: currentMessage || messages[messages.length - 1]
+          content: currentMessage || messages[messages.length - 1].content
         }]
       });
-      addMessage(content);
+      addMessage({ role: 'assistant', content });
     } catch (error) {
       console.error('Failed to fetch message:', error);
     }

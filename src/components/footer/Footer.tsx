@@ -18,13 +18,9 @@ export function Footer() {
 
   const handleSendMessage = async () => {
     if (isSendDisabled) return;
-
     const currentMessage = message;
-    // Add user message to chat
-    addMessage(currentMessage);
-    // Clear input
+    addMessage({ role: "user", content: currentMessage });
     setMessage("");
-    // Get AI response
     await fetchMessage(currentMessage);
   };
 

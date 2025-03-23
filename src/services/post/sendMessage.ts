@@ -7,7 +7,7 @@ interface SendMessageParams {
 }
 
 export async function sendMessage({ model, messages }: SendMessageParams): Promise<string> {
-  console.log('Sending message:', { model, messages });
+  
   try {
     const response = await fetch(GROQ_URL_COMPLETION, {
       method: 'POST',
