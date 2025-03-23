@@ -1,4 +1,4 @@
-import { GROQ_API_KEY, GROQ_URL } from "../../constants";
+import { GROQ_API_KEY, GROQ_URL_MODELS } from "../../constants";
 import { ModelOption } from "../../types/modelOtions";
 import { ModelResponse } from "../../types/modelResponse";
 
@@ -10,7 +10,7 @@ export const mapModelResponse = (model: ModelResponse): ModelOption => ({
 export const getListModels = async (): Promise<ModelOption[]> => {
 
   try {
-    const response = await fetch(GROQ_URL, {
+    const response = await fetch(GROQ_URL_MODELS, {
       headers: {
         Authorization: `Bearer ${GROQ_API_KEY}`,
       },
