@@ -1,7 +1,14 @@
 import ReactMarkdown from "react-markdown";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 import type { Components } from "react-markdown";
+import { CodeBlock } from "./CodeBlock";
+import { 
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableHeader,
+  TableCell
+} from "./MarkdownTable";
 
 interface MessageContentProps {
   content: string;
@@ -42,52 +49,13 @@ const MarkdownComponents: Partial<Components> = {
       {children}
     </blockquote>
   ),
-  code: ({ node, inline, className, children, ...props }) => {
-    const match = /language-(\w+)/.exec(className || "");
-    return !inline && match ? (
-      <div className="rounded-md overflow-hidden my-2">
-        <SyntaxHighlighter
-          style={vscDarkPlus}
-          language={match[1]}
-          PreTag="div"
-          className="rounded-md"
-          {...props}
-        >
-          {String(children).replace(/\n$/, "")}
-        </SyntaxHighlighter>
-      </div>
-    ) : (
-      <code className="bg-[var(--color-bg-secondary)] px-1 py-0.5 rounded text-sm" {...props}>
-        {children}
-      </code>
-    );
-  },
-  table: ({ children }) => (
-    <div className="overflow-x-auto my-4">
-      <table className="min-w-full border-collapse border border-[var(--color-accent)]">
-        {children}
-      </table>
-    </div>
-  ),
-  thead: ({ children }) => (
-    <thead className="bg-[var(--color-bg-secondary)]">{children}</thead>
-  ),
-  tbody: ({ children }) => (
-    <tbody>{children}</tbody>
-  ),
-  tr: ({ children }) => (
-    <tr className="border-b border-[var(--color-accent)] last:border-0">{children}</tr>
-  ),
-  th: ({ children }) => (
-    <th className="px-4 py-2 text-left border-r border-[var(--color-accent)] last:border-0 font-bold">
-      {children}
-    </th>
-  ),
-  td: ({ children }) => (
-    <td className="px-4 py-2 border-r border-[var(--color-accent)] last:border-0">
-      {children}
-    </td>
-  ),
+  code: CodeBlock,
+  table: Table,
+  thead: TableHead,
+  tbody: TableBody,
+  tr: TableRow,
+  th: TableHeader,
+  td: TableCell,
 };
 
 export function MessageContent({ content }: MessageContentProps) {
