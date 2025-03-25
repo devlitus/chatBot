@@ -29,9 +29,10 @@ export async function sendMessage({ model, messages }: SendMessageParams): Promi
 }
 
 function mapChatResponse(response: ChatResponse): string {
+  console.log(response);
   if (!response.choices || response.choices.length === 0) {
     throw new Error('No response choices available');
   }
   return response.choices[0].message.content;
-}
-
+  }
+  
