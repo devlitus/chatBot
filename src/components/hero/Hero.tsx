@@ -9,7 +9,7 @@ export function Hero() {
       <Button variant="secondary" size="sm">
         <ChevronLeft />
       </Button>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-30">
         <Dropdown />
         <Switch />
       </div>
