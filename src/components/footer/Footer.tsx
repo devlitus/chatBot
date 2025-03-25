@@ -9,7 +9,7 @@ import { useListModelStore } from "@/stores/listModel";
 
 export function Footer() {
   const [message, setMessage] = useState("");
-  const { addMessage } = useChatStore();
+  const { addMessage, currentChatId, addChat } = useChatStore();
   const { fetchMessage } = useMessage();
   const { selectedModel } = useListModelStore();
 
@@ -18,7 +18,13 @@ export function Footer() {
 
   const handleSendMessage = async () => {
     if (isSendDisabled) return;
-    const currentMessage = message;
+    
+    // Si no hay un chat activo, crear uno nuevo
+    if (!currentChatId) {
+      addChat();
+    }
+    
+    const currentMessage = message.trim();
     addMessage({ role: "user", content: currentMessage });
     setMessage("");
     await fetchMessage(currentMessage);

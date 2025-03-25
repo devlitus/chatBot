@@ -14,8 +14,20 @@ export function Sidebar() {
 
   const getFirstUserMessage = (chatId: string) => {
     const chat = chats.find(c => c.id === chatId);
-    const firstUserMessage = chat?.messages.find(m => m.role === "user");
-    return firstUserMessage ? getFirstFiveWords(firstUserMessage.content) : "Nueva conversación";
+    if (!chat?.messages.length) return "Nueva conversación";
+    
+    // Find the first assistant message
+    const firstAssistantIndex = chat.messages.findIndex(m => m.role === "assistant");
+    if (firstAssistantIndex === -1) return "Nueva conversación";
+    
+    // Find the first user message after the first assistant message
+    const firstUserAfterAssistant = chat.messages
+      .slice(firstAssistantIndex)
+      .find(m => m.role === "user");
+      
+    return firstUserAfterAssistant 
+      ? getFirstFiveWords(firstUserAfterAssistant.content) 
+      : "Nueva conversación";
   };
 
   const handleDeleteChat = (e: React.MouseEvent, chatId: string) => {

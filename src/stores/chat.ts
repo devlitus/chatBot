@@ -35,6 +35,16 @@ export const useChatStore = create<ChatStore>((set) => ({
     if (savedChats) {
       const chats = JSON.parse(savedChats);
       set({ chats, currentChatId: chats[0]?.id || null });
+    } else {
+      // Si no hay chats guardados, crear uno nuevo
+      const initialChat: Chat = {
+        id: uuidv4(),
+        title: `Chat ${new Date().toLocaleString()}`,
+        messages: []
+      };
+      const initialChats = [initialChat];
+      saveChatsToLocalStorage(initialChats);
+      set({ chats: initialChats, currentChatId: initialChat.id });
     }
   },
 
