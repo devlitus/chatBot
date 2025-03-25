@@ -20,8 +20,14 @@
   font-size: var(--font-size-md);
   cursor: pointer;
   transition: all 0.2s ease-in-out;
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
 }
 
+.dropdown-trigger:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 1px var(--color-primary-transparent);
+}
 
 .dropdown-arrow {
   transition: transform 0.2s ease-in-out;
@@ -33,13 +39,32 @@
 
 .dropdown-menu {
   position: absolute;
-  top: calc(100% + 4px);
+  top: calc(100% + 8px);
   left: 0;
   right: 0;
   background-color: var(--color-surface);
-  max-height: 200px;
+  max-height: 300px;
   overflow-y: auto;
-  z-index: 1000;
+  z-index: 1;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  transition: opacity 0.2s, transform 0.2s;
+  transform-origin: top center;
+  opacity: 0;
+  transform: translateY(-10px);
+  animation: dropdownFadeIn 0.2s forwards;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .dropdown-item {
@@ -49,31 +74,106 @@
   font-size: var(--font-size-xs);
   text-align: left;
   cursor: pointer;
-  transition: background-color 0.2s ease-in-out;
+  padding: 0.75rem 1rem;
+  transition: all 0.2s ease;
+  border-radius: 4px;
+  margin: 2px 0;
 }
 
 .dropdown-item:hover {
-  background-color: var(--color-purple-dark);
+  background-color: var(--color-surface-hover);
+  transform: translateX(2px);
 }
 
 .dropdown-item.selected {
-  background-color: var(--color-primary);
-  color: var(--color-text-primary);
+  background-color: var(--color-primary-transparent);
+  color: var(--color-primary);
+  font-weight: 500;
+}
+
+.company-group {
+  border-bottom: 1px solid var(--color-border);
+  padding: 4px 8px;
+}
+
+.company-group:last-child {
+  border-bottom: none;
+}
+
+.company-label {
+  padding: 0.5rem 1rem;
+  font-weight: bold;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  background-color: var(--color-surface-alt);
+  border-radius: 4px;
+  margin: 4px 0;
+  display: flex;
+  align-items: center;
+  letter-spacing: 0.5px;
+}
+
+.model-name {
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+  transition: color 0.2s;
+}
+
+.dropdown-item:hover .model-name {
+  color: var(--color-primary);
+}
+
+.model-company {
+  color: var(--color-text-secondary);
+  transition: opacity 0.2s;
+}
+
+.dropdown-item:hover .model-company {
+  opacity: 1;
 }
 
 /* Scrollbar styling */
 .dropdown-menu::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 .dropdown-menu::-webkit-scrollbar-track {
-  background: var(--color-surface);
+  background: var(--color-surface-alt);
+  border-radius: 3px;
 }
 
 .dropdown-menu::-webkit-scrollbar-thumb {
-  background: var(--color-purple);
+  background: var(--color-primary-transparent);
+  border-radius: 3px;
 }
 
 .dropdown-menu::-webkit-scrollbar-thumb:hover {
-  background: var(--color-accent);
+  background: var(--color-primary);
+}
+
+/* Capability badges */
+.capability-badge {
+  display: inline-block;
+  padding: 0.1rem 0.3rem;
+  border-radius: 4px;
+  background-color: var(--color-primary-transparent);
+  font-size: 0.6rem;
+  margin-right: 0.25rem;
+  color: var(--color-primary);
+}
+
+/* Spinner de carga */
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid var(--color-primary-transparent);
+  border-top: 3px solid var(--color-primary);
+  border-radius: 50%;
+  margin: 0 auto;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
