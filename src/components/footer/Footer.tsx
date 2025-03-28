@@ -1,20 +1,20 @@
-import { Button } from "../ui/button/Button";
-import { Upload } from "../icons/Upload";
-import { Send } from "../icons/Send";
 import { NoSend } from "../icons/NoSend";
 import { useChatStore } from "@/stores/chat";
 import { useState } from "react";
 import { useMessage } from "@/hooks/useMessage";
 import { useListModelStore } from "@/stores/listModel";
+import { Button } from "../ui/button/Button";
+import { Upload } from "../icons/Upload";
+import { Send } from "../icons/Send";
 
 export function Footer() {
   const [message, setMessage] = useState("");
   const { addMessage, currentChatId, addChat } = useChatStore();
-  const { fetchMessage } = useMessage();
+  const { fetchMessage, isLoading } = useMessage();
   const { selectedModel } = useListModelStore();
 
   const isInputDisabled = selectedModel === "Modelos LLM";
-  const isSendDisabled = isInputDisabled || !message.trim();
+  const isSendDisabled = isInputDisabled || !message.trim() || isLoading;
 
   const handleSendMessage = async () => {
     if (isSendDisabled) return;
@@ -27,7 +27,13 @@ export function Footer() {
     const currentMessage = message.trim();
     addMessage({ role: "user", content: currentMessage });
     setMessage("");
-    await fetchMessage(currentMessage);
+    
+    // Enviar mensaje y comprobar respuesta
+    const response = await fetchMessage(currentMessage);
+    
+    // Si la respuesta es exitosa, los chats ya se han guardado en localStorage
+    // a través del store (saveChatsToLocalStorage)
+    console.log("Respuesta del servicio:", response);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -46,25 +52,26 @@ export function Footer() {
       <div className="flex-1 relative">
         <input
           type="text"
+          placeholder={isInputDisabled ? "Seleccione un modelo LLM para chatear" : "Escriba un mensaje..."}
+          className="w-full p-3 rounded-md bg-[var(--color-surface-secondary)] text-[var(--color-text-primary)] outline-none"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={handleKeyPress}
-          disabled={isInputDisabled}
-          className="w-full text-[var(--color-text-primary)] px-4 py-2 pr-12 border border-[var(--color-accent)] rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed"
-          placeholder={
-            isInputDisabled
-              ? "Selecciona un modelo para empezar..."
-              : "Escribe un mensaje..."
-          }
+          disabled={isInputDisabled || isLoading}
         />
-        <Button
-          variant="secondary"
-          className="absolute right-2 top-1/2 -translate-y-1/2 disabled:hover:bg-transparent disabled:cursor-not-allowed"
+        <button
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text-primary)]"
           onClick={handleSendMessage}
           disabled={isSendDisabled}
         >
-          {isSendDisabled ? <NoSend /> : <Send />}
-        </Button>
+          {isLoading ? (
+            <div className="animate-spin h-5 w-5 border-2 border-[var(--color-accent)] border-t-transparent rounded-full"></div>
+          ) : isSendDisabled ? (
+            <NoSend />
+          ) : (
+            <Send />
+          )}
+        </button>
       </div>
     </div>
   );
