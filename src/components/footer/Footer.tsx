@@ -18,12 +18,12 @@ export function Footer() {
 
   const handleSendMessage = async () => {
     if (isSendDisabled) return;
-    
+
     // Si no hay un chat activo, crear uno nuevo
     if (!currentChatId) {
       addChat();
     }
-    
+
     const currentMessage = message.trim();
     addMessage({ role: "user", content: currentMessage });
     setMessage("");

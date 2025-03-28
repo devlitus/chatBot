@@ -4,10 +4,11 @@ import { Hero } from "@/components/hero/Hero";
 import { Sidebar } from "@/components/sidebar/Sidebar";
 import { useThemeStore } from "@/stores/theme";
 import "@/styles/theme.css";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export function App() {
   const isDark = useThemeStore((state) => state.isDark);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", isDark);
@@ -15,13 +16,17 @@ export function App() {
 
   return (
     <div className="flex h-svh ">
-      <aside className="w-[280px] min-w-[280px] bg-[var(--color-surface)]">
+      <aside 
+        className={`transition-all duration-300 ease-in-out bg-[var(--color-surface)] ${
+          isSidebarOpen ? "w-[280px] min-w-[280px]" : "w-0 min-w-0 overflow-hidden"
+        }`}
+      >
         <Sidebar />
       </aside>
 
       <div className="flex-1 flex flex-col h-full bg-[var(--color-surface)]">
         <header className="w-full">
-          <Hero />
+          <Hero toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} isSidebarOpen={isSidebarOpen} />
         </header>
 
         <main className="flex-1 overflow-auto bg-[var(--color-surface)]">

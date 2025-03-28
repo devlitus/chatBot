@@ -3,10 +3,22 @@ import { Switch } from "../ui/switch/Switch";
 import { ChevronLeft } from "../icons/ChevronLeft";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 
-export function Hero() {
+interface HeroProps {
+  toggleSidebar: () => void;
+  isSidebarOpen: boolean;
+}
+
+export function Hero({ toggleSidebar, isSidebarOpen }: HeroProps) {
   return (
-    <div className="flex items-center justify-between p-4  text-[var(--color-text-primary)]">
-      <Button variant="secondary" size="sm">
+    <div className="flex items-center justify-between p-4 text-[var(--color-text-primary)]">
+      <Button 
+        variant="secondary" 
+        size="sm" 
+        onClick={toggleSidebar}
+        title={isSidebarOpen ? "Cerrar sidebar" : "Abrir sidebar"}
+        className="transition-transform duration-300"
+        style={{ transform: isSidebarOpen ? 'rotate(0deg)' : 'rotate(180deg)' }}
+      >
         <ChevronLeft />
       </Button>
       <div className="flex items-center gap-30">
