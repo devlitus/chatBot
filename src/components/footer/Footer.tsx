@@ -27,10 +27,10 @@ export function Footer() {
     const currentMessage = message.trim();
     addMessage({ role: "user", content: currentMessage });
     setMessage("");
-    
+
     // Enviar mensaje y comprobar respuesta
     const response = await fetchMessage(currentMessage);
-    
+
     // Si la respuesta es exitosa, los chats ya se han guardado en localStorage
     // a través del store (saveChatsToLocalStorage)
     console.log("Respuesta del servicio:", response);
@@ -52,8 +52,10 @@ export function Footer() {
       <div className="flex-1 relative">
         <input
           type="text"
-          placeholder={isInputDisabled ? "Seleccione un modelo LLM para chatear" : "Escriba un mensaje..."}
-          className="w-full p-3 rounded-md bg-[var(--color-surface-secondary)] text-[var(--color-text-primary)] outline-none"
+          placeholder="Escriba un mensaje..."
+          className="w-full p-3 rounded-lg bg-[var(--color-surface-secondary)] text-[var(--color-text-primary)] outline-none
+          border border-[var(--color-secondary)] shadow-sm
+          focus:ring-2 focus:ring-[var(--color-accent)] focus:ring-opacity-50 focus:border-[var(--color-accent)] transition-all"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={handleKeyPress}
