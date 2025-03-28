@@ -8,7 +8,9 @@ export function useDropdown() {
   const fetchModels = useCallback(async () => {
     try {
       const response = await getListModels();
-      setListModels(response);
+      if (response.length > 0) {
+        setListModels(response);
+      }
     } catch (error) {
       console.error('Error fetching models:', error);
     }
