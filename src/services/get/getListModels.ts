@@ -1,5 +1,5 @@
+import { ModelOption, COMPANY_NAMES } from "@/types/modelOptions";
 import { GROQ_API_KEY, GROQ_URL_MODELS } from "../../constants";
-import { COMPANY_NAMES, ModelOption } from "../../types/modelOtions";
 import { ModelResponse } from "../../types/modelResponse";
 
 /**

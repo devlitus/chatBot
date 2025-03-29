@@ -34,6 +34,14 @@ export function Dropdown() {
     return size.toString();
   };
 
+  // Determinar el texto a mostrar en el botón del dropdown
+  const getDisplayText = () => {
+    if (selectedModel === "Modelos LLM") {
+      return "Seleccionar modelo";
+    }
+    return selectedModel;
+  };
+
   return (
     <div className="dropdown">
       <Button
@@ -41,7 +49,7 @@ export function Dropdown() {
         className={`dropdown-trigger ${isOpen ? "open" : ""}`}
         onClick={() => setIsOpen(!isOpen)}
       >
-        {selectedModel || "Seleccionar modelo"}
+        {getDisplayText()}
         <ArrowDown className="ml-4" isOpen={isOpen} />
       </Button>
 
