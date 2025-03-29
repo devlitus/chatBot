@@ -27,7 +27,7 @@ describe('useMessage', () => {
       chats: [{
         id: '123',
         messages: [],
-        isActive: false
+        isActive: true
       }],
       addMessage: mockAddMessage,
       activateChat: mockActivateChat
@@ -111,7 +111,19 @@ describe('useMessage', () => {
     expect(mockSetIsLoading).toHaveBeenCalledWith(false);
   });
 
-  it('should maintain backwards compatibility with fetchMessage', async () => {
+  it('should handle fetchMessage in active chat', async () => {
+    // Mock an active chat
+    vi.mocked(useChatStore).mockReturnValue({
+      currentChatId: '123',
+      chats: [{
+        id: '123',
+        messages: [],
+        isActive: true
+      }],
+      addMessage: mockAddMessage,
+      activateChat: mockActivateChat
+    });
+
     const { result } = renderHook(() => useMessage());
 
     await act(async () => {
@@ -124,6 +136,30 @@ describe('useMessage', () => {
       role: 'assistant',
       content: 'AI response'
     });
+  });
+
+  it('should handle fetchMessage in inactive chat', async () => {
+    // Mock an inactive chat
+    vi.mocked(useChatStore).mockReturnValue({
+      currentChatId: '123',
+      chats: [{
+        id: '123',
+        messages: [],
+        isActive: false
+      }],
+      addMessage: mockAddMessage,
+      activateChat: mockActivateChat
+    });
+
+    const { result } = renderHook(() => useMessage());
+
+    await act(async () => {
+      const response = await result.current.fetchMessage('test message');
+      expect(response.success).toBe(true);
+      expect(response.data).toBe(null);
+    });
+
+    expect(mockAddMessage).not.toHaveBeenCalled();
   });
 
   it('should handle sending a message successfully', async () => {
@@ -146,16 +182,17 @@ describe('useMessage', () => {
     vi.mocked(useChatStore).mockReturnValue({
       currentChatId: '',
       chats: [],
-      addMessage: mockAddMessage
+      addMessage: mockAddMessage,
+      activateChat: mockActivateChat
     });
 
     const { result } = renderHook(() => useMessage());
     
-    const message = 'Hello, world!';
-    const response = await result.current.handleSendMessage(message);
+    const response = await result.current.handleSendMessage('test message');
     
     expect(response.success).toBe(false);
     expect(response.error).toBe('No active chat');
+    expect(mockSetIsLoading).not.toHaveBeenCalled();
     expect(mockAddMessage).not.toHaveBeenCalled();
   });
 
@@ -166,11 +203,11 @@ describe('useMessage', () => {
 
     const { result } = renderHook(() => useMessage());
     
-    const message = 'Hello, world!';
-    const response = await result.current.handleSendMessage(message);
+    const response = await result.current.handleSendMessage('test message');
     
     expect(response.success).toBe(false);
     expect(response.error).toBe('No model selected');
+    expect(mockSetIsLoading).not.toHaveBeenCalled();
     expect(mockAddMessage).not.toHaveBeenCalled();
   });
 });
