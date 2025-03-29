@@ -7,8 +7,9 @@ interface MessageProps {
 
 export function Message({ role, content }: MessageProps) {
   return (
-    <div className={`flex ${role === "assistant" ? "justify-start" : "justify-end"}`}>
+    <div className={`flex ${role === "assistant" ? "justify-start" : "justify-end"}`} data-testid="message-wrapper">
       <div
+        data-testid="message-container"
         className={`max-w-[80%] px-4 py-2 rounded-lg ${
           role === "assistant"
             ? "bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)]"

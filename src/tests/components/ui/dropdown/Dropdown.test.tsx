@@ -27,6 +27,6 @@ describe("Dropdown Component", () => {
     render(<Dropdown />);
 
     // Verificar que el texto "Seleccionar modelo" está presente
-    expect(screen.getByText("Seleccionar modelo")).toBeInTheDocument();
+    expect(screen.getByText("Seleccionar modelo LLM")).toBeInTheDocument();
   });
 });

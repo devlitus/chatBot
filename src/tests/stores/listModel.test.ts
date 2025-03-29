@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { useListModelStore } from '../../stores/listModel';
 import { act } from '@testing-library/react';
-import { openAIModels, mockModelOptions } from '@/tests/mocks/modelMocks';
+import { mockModelOptions } from '@/tests/mocks/modelMocks';
 
 // Limpiar el store entre pruebas
 const cleanupStore = () => {
@@ -25,11 +25,11 @@ describe('useListModelStore', () => {
     const { setSelectedModel } = useListModelStore.getState();
     
     act(() => {
-      setSelectedModel('gpt-3.5-turbo');
+      setSelectedModel('model1');
     });
     
     const { selectedModel } = useListModelStore.getState();
-    expect(selectedModel).toBe('gpt-3.5-turbo');
+    expect(selectedModel).toBe('model1');
   });
 
   it('should update list models', () => {
@@ -42,7 +42,7 @@ describe('useListModelStore', () => {
     const { listModels } = useListModelStore.getState();
     expect(listModels).toEqual(mockModelOptions);
     expect(listModels[0].options.length).toBe(2);
-    expect(listModels[0].options[0].id).toBe('gpt-3.5-turbo');
+    expect(listModels[0].options[0].id).toBe('model1');
   });
   
   it('should maintain state between selectors', () => {
@@ -50,11 +50,11 @@ describe('useListModelStore', () => {
     
     act(() => {
       setListModels(mockModelOptions);
-      setSelectedModel(openAIModels[0].id);
+      setSelectedModel('model1');
     });
     
-    const state = useListModelStore.getState();
-    expect(state.selectedModel).toBe('gpt-3.5-turbo');
-    expect(state.listModels).toEqual(mockModelOptions);
+    const store = useListModelStore.getState();
+    expect(store.selectedModel).toBe('model1');
+    expect(store.listModels).toEqual(mockModelOptions);
   });
 });

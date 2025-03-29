@@ -1,102 +1,96 @@
-import { useChatStore } from "@/stores/chat";
 import { useListModelStore } from "@/stores/listModel";
-import { sendMessage } from "@/services/post/sendMessage";
 import { useMessageStore } from "@/stores/message";
 import { useCallback, useEffect } from "react";
+import { MessageService } from "@/services/messages/messageService";
+import { MessageResponse } from "@/types/message";
+import { useChatStore } from "@/stores/chat";
 
+/**
+ * Hook para manejar el envío y recepción de mensajes
+ */
 export function useMessage() {
   const { currentChatId, addMessage, chats, activateChat } = useChatStore();
   const { selectedModel } = useListModelStore();
   const { setIsLoading, isLoading } = useMessageStore();
-  
-  const handleSendMessage = useCallback(async (currentMessage: string) => {
-    if (!currentChatId) {
-      console.warn('No active chat');
-      return { success: false, error: 'No active chat' };
-    }
 
-    if (selectedModel === "Modelos LLM") {  
-      console.warn('No model selected');
-      return { success: false, error: 'No model selected' };
+  /**
+   * Maneja el envío de un mensaje
+   */
+  const handleSendMessage = useCallback(async (currentMessage: string): Promise<MessageResponse> => {
+    // Validar parámetros
+    const validationResult = MessageService.validateMessageParams(currentChatId, selectedModel);
+    if (!validationResult.success) {
+      return validationResult;
     }
 
     setIsLoading(true);
 
     try {
-      // Get current chat messages
+      // Obtener chat actual
       const currentChat = chats.find(chat => chat.id === currentChatId);
       if (!currentChat) {
-        console.warn('Chat not found');
         setIsLoading(false);
         return { success: false, error: 'Chat not found' };
       }
 
-      // Get the last few messages for context (limit to last 10 messages)
-      const recentMessages = currentChat.messages.slice(-10);
+      // Preparar y enviar mensajes
+      const recentMessages = MessageService.getRecentMessages(currentChat.messages);
+      const messagesToSend = MessageService.prepareMessagesToSend(recentMessages, currentMessage);
       
-      // Create messages array with new message
-      const messagesToSend = currentMessage 
-        ? [...recentMessages, { role: 'user', content: currentMessage }]
-        : recentMessages;
-
-      console.log('Sending messages to API:', messagesToSend);
-
-      // Send messages to API
-      const response = await sendMessage({
+      const response = await MessageService.sendMessageToAPI({
         model: selectedModel,
         messages: messagesToSend
       });
 
-      console.log('Received response:', response);
-      
-      // Add assistant's response to chat
-      if (response && typeof response === 'string') {
+      // Procesar respuesta
+      if (response.success && response.data) {
         addMessage({ 
           role: 'assistant', 
-          content: response.trim() 
+          content: response.data 
         });
-        
-        setIsLoading(false);
-        return { success: true, data: response.trim() };
       }
 
       setIsLoading(false);
-      return { success: false, error: 'Invalid response from API' };
+      return response;
 
-    } catch (error) {
-      console.error('Error sending message:', error);
+    } catch {
       setIsLoading(false);
-      return { success: false, error: 'Error sending message' };
+      return { 
+        success: false, 
+        error: 'Error processing message' 
+      };
     }
   }, [addMessage, selectedModel, chats, currentChatId, setIsLoading]);
 
-  // Observar cambios en el localStorage para mensajes pendientes
+  /**
+   * Procesa mensajes pendientes cuando cambia el chat
+   */
   useEffect(() => {
-    const checkPendingMessages = async () => {
+    const processPendingMessage = async () => {
       const currentChat = chats.find(chat => chat.id === currentChatId);
-      if (!currentChat || currentChat.isActive) return;
+      if (!currentChat || currentChat.isActive || isLoading) return;
 
       const lastMessage = currentChat.messages[currentChat.messages.length - 1];
       if (lastMessage?.role === 'user') {
-        // Hay un mensaje de usuario pendiente, procesarlo
         await handleSendMessage(lastMessage.content);
         activateChat(currentChat.id);
       }
     };
 
-    // Verificar mensajes pendientes cuando cambia el chat actual o los mensajes
-    checkPendingMessages();
-  }, [currentChatId, chats, activateChat, handleSendMessage]);
+    processPendingMessage();
+  }, [currentChatId, chats, activateChat, handleSendMessage, isLoading]);
 
-  // Mantener compatibilidad con la función fetchMessage
-  const fetchMessage = useCallback(async (currentMessage?: string) => {
-    const response = await handleSendMessage(currentMessage || '');
-    return {
-      success: response.success,
-      data: response.data,
-      error: response.error
-    };
-  }, [handleSendMessage]);
+  /**
+   * Mantiene compatibilidad con la función fetchMessage
+   */
+  const fetchMessage = useCallback(async (currentMessage?: string): Promise<MessageResponse> => {
+    const currentChat = chats.find(chat => chat.id === currentChatId);
+    if (currentChat && !currentChat.isActive) {
+      return { success: true, data: null };
+    }
+
+    return handleSendMessage(currentMessage || '');
+  }, [handleSendMessage, chats, currentChatId]);
 
   return {
     handleSendMessage,

@@ -1,13 +1,41 @@
-import { ChatMessage, ChatResponse, ChatUsage } from '@/types/chatResponse';
+import { vi } from 'vitest';
+import type { Message } from '@/types/message';
+import type { Chat } from '@/types/chat';
+import type { ChatMessage, ChatResponse, ChatUsage } from '@/types/chatResponse';
 
-export const mockModel = 'test-model';
-
-export const mockMessages: ChatMessage[] = [
-  { role: 'user', content: 'Hello' },
-  { role: 'assistant', content: 'Hi there!' }
+// Chat Messages Mocks
+export const mockMessages: Message[] = [
+  { id: "1", content: "Hello", role: "user" },
+  { id: "2", content: "Hi there", role: "assistant" },
 ];
 
-export const mockUsage: ChatUsage = {
+// Chat Store Mocks
+export const mockChats: Chat[] = [
+  {
+    id: "chat1",
+    messages: mockMessages,
+  }
+];
+
+export const getMockChatStore = (overrides = {}) => ({
+  chats: mockChats,
+  currentChatId: "chat1",
+  addMessage: vi.fn(),
+  addChat: vi.fn(),
+  ...overrides
+});
+
+// Message Store Mocks
+export const getMockMessageStore = (overrides = {}) => ({
+  isLoading: false,
+  setIsLoading: vi.fn(),
+  ...overrides
+});
+
+// Chat Response Mocks
+export const mockModel = 'gpt-3.5-turbo';
+
+export const mockChatUsage: ChatUsage = {
   queue_time: 0,
   prompt_tokens: 10,
   prompt_time: 0.1,
@@ -16,6 +44,11 @@ export const mockUsage: ChatUsage = {
   total_tokens: 15,
   total_time: 0.3
 };
+
+export const mockChatMessages: ChatMessage[] = [
+  { role: 'user', content: 'Hello' },
+  { role: 'assistant', content: 'Hi there!' }
+];
 
 export const mockResponse: ChatResponse = {
   id: 'response-1',
@@ -33,7 +66,7 @@ export const mockResponse: ChatResponse = {
       finish_reason: 'stop'
     }
   ],
-  usage: mockUsage,
+  usage: mockChatUsage,
   system_fingerprint: 'test-fingerprint'
 };
 
@@ -43,18 +76,40 @@ export const mockEmptyResponse: ChatResponse = {
   created: 1234567890,
   model: mockModel,
   choices: [],
-  usage: {
-    ...mockUsage,
-    completion_tokens: 0,
-    completion_time: 0,
-    total_tokens: 10,
-    total_time: 0.1
-  },
+  usage: mockChatUsage,
   system_fingerprint: 'test-fingerprint'
 };
 
 export const mockMalformedResponse = {
   id: 'response-1',
   object: 'chat.completion',
-  // Missing required fields
+  created: 1234567890,
+  model: mockModel,
+  // Missing choices field
+  system_fingerprint: 'test-fingerprint'
+} as ChatResponse;
+
+// DOM Mocks
+export const mockScrollIntoView = vi.fn();
+
+// Setup and Reset Functions
+export const setupChatMocks = () => {
+  const mockStore = vi.fn();
+  vi.mock("@/stores/chat", () => ({
+    useChatStore: mockStore
+  }));
+
+  vi.mock("@/stores/message", () => ({
+    useMessageStore: vi.fn().mockReturnValue(getMockMessageStore())
+  }));
+
+  window.HTMLElement.prototype.scrollIntoView = mockScrollIntoView;
+  
+  mockStore.mockReturnValue(getMockChatStore());
+  
+  return mockStore;
+};
+
+export const resetChatMocks = () => {
+  vi.clearAllMocks();
 };

@@ -37,7 +37,7 @@ export function Dropdown() {
   // Determinar el texto a mostrar en el botón del dropdown
   const getDisplayText = () => {
     if (selectedModel === "Modelos LLM") {
-      return "Seleccionar modelo";
+      return "Seleccionar modelo LLM";
     }
     return selectedModel;
   };

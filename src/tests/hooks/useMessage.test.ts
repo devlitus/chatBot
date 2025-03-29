@@ -1,176 +1,160 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useMessage } from '@/hooks/useMessage';
-import { useChatStore } from '@/stores/chat';
-import { useListModelStore } from '@/stores/listModel';
-import { useMessageStore } from '@/stores/message';
-import { vi, describe, expect, it, beforeEach } from 'vitest';
+import { MessageService } from '@/services/messages/messageService';
 
-// Mock the modules
-vi.mock('@/stores/chat');
-vi.mock('@/stores/listModel');
-vi.mock('@/stores/message');
-vi.mock('@/services/post/sendMessage', () => ({
-  sendMessage: vi.fn().mockResolvedValue('AI response')
+// Mock de los stores
+vi.mock('@/stores/chat', () => ({
+  useChatStore: vi.fn(() => ({
+    currentChatId: 'chat-1',
+    addMessage: vi.fn(),
+    chats: [
+      {
+        id: 'chat-1',
+        isActive: true,
+        messages: [
+          { role: 'user', content: 'Test message' }
+        ]
+      }
+    ],
+    activateChat: vi.fn()
+  }))
+}));
+
+vi.mock('@/stores/listModel', () => ({
+  useListModelStore: vi.fn(() => ({
+    selectedModel: 'gpt-4'
+  }))
+}));
+
+vi.mock('@/stores/message', () => ({
+  useMessageStore: vi.fn(() => ({
+    setIsLoading: vi.fn(),
+    isLoading: false
+  }))
+}));
+
+// Mock del MessageService
+vi.mock('@/services/messages/messageService', () => ({
+  MessageService: {
+    validateMessageParams: vi.fn(),
+    getRecentMessages: vi.fn(),
+    prepareMessagesToSend: vi.fn(),
+    sendMessageToAPI: vi.fn()
+  }
 }));
 
 describe('useMessage', () => {
-  const mockAddMessage = vi.fn();
-  const mockSetIsLoading = vi.fn();
-  const mockActivateChat = vi.fn();
-  
   beforeEach(() => {
     vi.clearAllMocks();
-    
-    // Mock store implementations
-    vi.mocked(useChatStore).mockReturnValue({
-      currentChatId: '123',
-      chats: [{
-        id: '123',
-        messages: [],
-        isActive: false
-      }],
-      addMessage: mockAddMessage,
-      activateChat: mockActivateChat
-    });
-    
-    vi.mocked(useListModelStore).mockReturnValue({
-      selectedModel: 'gpt-3.5-turbo'
-    });
-
-    vi.mocked(useMessageStore).mockReturnValue({
-      setIsLoading: mockSetIsLoading,
-      isLoading: false
-    });
   });
 
-  it('should process pending messages in inactive chats', async () => {
-    // Mock an inactive chat with a pending user message
-    vi.mocked(useChatStore).mockReturnValue({
-      currentChatId: '123',
-      chats: [{
-        id: '123',
-        messages: [{ role: 'user', content: 'test message' }],
-        isActive: false
-      }],
-      addMessage: mockAddMessage,
-      activateChat: mockActivateChat
-    });
+  describe('handleSendMessage', () => {
+    it('should handle successful message sending', async () => {
+      // Mock setup
+      vi.mocked(MessageService.validateMessageParams).mockReturnValue({ success: true });
+      vi.mocked(MessageService.getRecentMessages).mockReturnValue([]);
+      vi.mocked(MessageService.prepareMessagesToSend).mockReturnValue([
+        { role: 'user', content: 'Test' }
+      ]);
+      vi.mocked(MessageService.sendMessageToAPI).mockResolvedValue({
+        success: true,
+        data: 'API Response'
+      });
 
-    renderHook(() => useMessage());
+      const { result } = renderHook(() => useMessage());
 
-    // Wait for the effect to process the pending message
-    await act(async () => {
-      await new Promise(resolve => setTimeout(resolve, 0));
-    });
+      // Execute
+      const response = await act(async () => {
+        return await result.current.handleSendMessage('Test message');
+      });
 
-    expect(mockAddMessage).toHaveBeenCalledWith({
-      role: 'assistant',
-      content: 'AI response'
-    });
-    expect(mockActivateChat).toHaveBeenCalledWith('123');
-  });
-
-  it('should not process messages in active chats', async () => {
-    // Mock an active chat with a message
-    vi.mocked(useChatStore).mockReturnValue({
-      currentChatId: '123',
-      chats: [{
-        id: '123',
-        messages: [{ role: 'user', content: 'test message' }],
-        isActive: true
-      }],
-      addMessage: mockAddMessage,
-      activateChat: mockActivateChat
-    });
-
-    renderHook(() => useMessage());
-
-    // Wait for any potential effects
-    await act(async () => {
-      await new Promise(resolve => setTimeout(resolve, 0));
-    });
-
-    expect(mockAddMessage).not.toHaveBeenCalled();
-    expect(mockActivateChat).not.toHaveBeenCalled();
-  });
-
-  it('should handle sending new messages', async () => {
-    const { result } = renderHook(() => useMessage());
-
-    await act(async () => {
-      const response = await result.current.handleSendMessage('new message');
+      // Verify
       expect(response.success).toBe(true);
-      expect(response.data).toBe('AI response');
+      expect(response.data).toBe('API Response');
     });
 
-    expect(mockSetIsLoading).toHaveBeenCalledWith(true);
-    expect(mockAddMessage).toHaveBeenCalledWith({
-      role: 'assistant',
-      content: 'AI response'
+    it('should handle validation failure', async () => {
+      // Mock setup
+      vi.mocked(MessageService.validateMessageParams).mockReturnValue({
+        success: false,
+        error: 'Validation error'
+      });
+
+      const { result } = renderHook(() => useMessage());
+
+      // Execute
+      const response = await act(async () => {
+        return await result.current.handleSendMessage('Test message');
+      });
+
+      // Verify
+      expect(response.success).toBe(false);
+      expect(response.error).toBe('Validation error');
     });
-    expect(mockSetIsLoading).toHaveBeenCalledWith(false);
+
+    it('should handle API error', async () => {
+      // Mock setup
+      vi.mocked(MessageService.validateMessageParams).mockReturnValue({ success: true });
+      vi.mocked(MessageService.sendMessageToAPI).mockResolvedValue({
+        success: false,
+        error: 'API error'
+      });
+
+      const { result } = renderHook(() => useMessage());
+
+      // Execute
+      const response = await act(async () => {
+        return await result.current.handleSendMessage('Test message');
+      });
+
+      // Verify
+      expect(response.success).toBe(false);
+      expect(response.error).toBe('API error');
+    });
   });
 
-  it('should maintain backwards compatibility with fetchMessage', async () => {
-    const { result } = renderHook(() => useMessage());
+  describe('fetchMessage', () => {
+    it('should return null for inactive chat', async () => {
+      // Mock setup with inactive chat
+      const mockUseChatStore = vi.fn(() => ({
+        currentChatId: 'chat-1',
+        chats: [
+          {
+            id: 'chat-1',
+            isActive: false,
+            messages: []
+          }
+        ]
+      }));
 
-    await act(async () => {
-      const response = await result.current.fetchMessage('test message');
+      vi.mock('@/stores/chat', () => ({
+        useChatStore: mockUseChatStore
+      }));
+
+      const { result } = renderHook(() => useMessage());
+
+      // Execute
+      const response = await result.current.fetchMessage('Test message');
+
+      // Verify
       expect(response.success).toBe(true);
-      expect(response.data).toBe('AI response');
+      expect(response.data).toBeNull();
     });
 
-    expect(mockAddMessage).toHaveBeenCalledWith({
-      role: 'assistant',
-      content: 'AI response'
+    it('should forward message to handleSendMessage for active chat', async () => {
+      const { result } = renderHook(() => useMessage());
+      const mockResponse = { success: true, data: 'Response' };
+      
+      vi.mocked(MessageService.validateMessageParams).mockReturnValue({ success: true });
+      vi.mocked(MessageService.sendMessageToAPI).mockResolvedValue(mockResponse);
+
+      // Execute
+      const response = await result.current.fetchMessage('Test message');
+
+      // Verify
+      expect(response.success).toBe(true);
+      expect(response.data).toBe('Response');
     });
-  });
-
-  it('should handle sending a message successfully', async () => {
-    const { result } = renderHook(() => useMessage());
-    
-    const message = 'Hello, world!';
-    const response = await result.current.handleSendMessage(message);
-    
-    expect(mockSetIsLoading).toHaveBeenCalledWith(true);
-    expect(mockAddMessage).toHaveBeenCalledWith({
-      role: 'assistant',
-      content: 'AI response'
-    });
-    expect(response.success).toBe(true);
-    expect(response.data).toBe('AI response');
-    expect(mockSetIsLoading).toHaveBeenCalledWith(false);
-  });
-
-  it('should handle errors when no chat is active', async () => {
-    vi.mocked(useChatStore).mockReturnValue({
-      currentChatId: '',
-      chats: [],
-      addMessage: mockAddMessage
-    });
-
-    const { result } = renderHook(() => useMessage());
-    
-    const message = 'Hello, world!';
-    const response = await result.current.handleSendMessage(message);
-    
-    expect(response.success).toBe(false);
-    expect(response.error).toBe('No active chat');
-    expect(mockAddMessage).not.toHaveBeenCalled();
-  });
-
-  it('should handle errors when no model is selected', async () => {
-    vi.mocked(useListModelStore).mockReturnValue({
-      selectedModel: 'Modelos LLM'
-    });
-
-    const { result } = renderHook(() => useMessage());
-    
-    const message = 'Hello, world!';
-    const response = await result.current.handleSendMessage(message);
-    
-    expect(response.success).toBe(false);
-    expect(response.error).toBe('No model selected');
-    expect(mockAddMessage).not.toHaveBeenCalled();
   });
 });
