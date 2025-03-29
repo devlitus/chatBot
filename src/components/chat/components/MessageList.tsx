@@ -10,7 +10,7 @@ interface MessageType {
 
 interface MessageListProps {
   messages: MessageType[];
-  messagesEndRef: RefObject<HTMLDivElement>;
+  messagesEndRef: RefObject<HTMLDivElement | null>;
 }
 
 export function MessageList({ messages, messagesEndRef }: MessageListProps) {
