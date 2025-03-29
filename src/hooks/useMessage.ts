@@ -74,11 +74,11 @@ export function useMessage() {
   useEffect(() => {
     const checkPendingMessages = async () => {
       const currentChat = chats.find(chat => chat.id === currentChatId);
-      if (!currentChat || currentChat.isActive) return;
+      if (!currentChat || currentChat.isActive || isLoading) return;
 
       const lastMessage = currentChat.messages[currentChat.messages.length - 1];
       if (lastMessage?.role === 'user') {
-        // Hay un mensaje de usuario pendiente, procesarlo
+        // Solo procesar si no estamos ya cargando una respuesta
         await handleSendMessage(lastMessage.content);
         activateChat(currentChat.id);
       }
@@ -86,17 +86,23 @@ export function useMessage() {
 
     // Verificar mensajes pendientes cuando cambia el chat actual o los mensajes
     checkPendingMessages();
-  }, [currentChatId, chats, activateChat, handleSendMessage]);
+  }, [currentChatId, chats, activateChat, handleSendMessage, isLoading]);
 
   // Mantener compatibilidad con la función fetchMessage
   const fetchMessage = useCallback(async (currentMessage?: string) => {
+    // Solo enviar mensaje si el chat está activo o no hay mensaje pendiente
+    const currentChat = chats.find(chat => chat.id === currentChatId);
+    if (currentChat && !currentChat.isActive) {
+      return { success: true, data: null };
+    }
+
     const response = await handleSendMessage(currentMessage || '');
     return {
       success: response.success,
       data: response.data,
       error: response.error
     };
-  }, [handleSendMessage]);
+  }, [handleSendMessage, chats, currentChatId]);
 
   return {
     handleSendMessage,
