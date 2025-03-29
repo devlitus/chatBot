@@ -1,14 +1,13 @@
-import React from 'react';
-import { render, RenderOptions } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { vi } from 'vitest';
+import React from "react";
+import { render, RenderOptions } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { vi } from "vitest";
 
 /**
  * Opciones para renderizar componentes en pruebas
  */
-interface CustomRenderOptions extends Omit<RenderOptions, 'wrapper'> {
+interface CustomRenderOptions extends Omit<RenderOptions, "wrapper"> {
   route?: string;
-  initialState?: Record<string, any>;
 }
 
 /**
@@ -20,11 +19,11 @@ export function renderWithProviders(
   ui: React.ReactElement,
   options: CustomRenderOptions = {}
 ) {
-  const { route, initialState, ...renderOptions } = options;
+  const { route, ...renderOptions } = options;
 
   // Configurar la ubicación si se proporciona una ruta
   if (route) {
-    window.history.pushState({}, 'Test page', route);
+    window.history.pushState({}, "Test page", route);
   }
 
   // Renderizar el componente con las opciones proporcionadas
@@ -52,7 +51,8 @@ export function createMockEvent(eventName: string) {
 /**
  * Espera a que se complete la siguiente actualización del DOM
  */
-export const waitForNextUpdate = () => new Promise(resolve => setTimeout(resolve, 0));
+export const waitForNextUpdate = () =>
+  new Promise((resolve) => setTimeout(resolve, 0));
 
 /**
  * Crea un mock para ResizeObserver
@@ -63,7 +63,7 @@ export function mockResizeObserver() {
     unobserve: vi.fn(),
     disconnect: vi.fn(),
   }));
-  
+
   global.ResizeObserver = resizeObserverMock;
   return resizeObserverMock;
 }
@@ -77,10 +77,10 @@ export function mockIntersectionObserver() {
     unobserve: vi.fn(),
     disconnect: vi.fn(),
     root: null,
-    rootMargin: '',
+    rootMargin: "",
     thresholds: [],
   }));
-  
+
   global.IntersectionObserver = intersectionObserverMock;
   return intersectionObserverMock;
 }
@@ -89,13 +89,13 @@ export function mockIntersectionObserver() {
  * Crea un mock para window.fetch
  * @param response Respuesta a devolver
  */
-export function mockFetch(response: any) {
+export function mockFetch<T>(response: T) {
   const fetchMock = vi.fn().mockResolvedValue({
     ok: true,
     json: async () => response,
     text: async () => JSON.stringify(response),
   });
-  
+
   global.fetch = fetchMock;
   return fetchMock;
 }
