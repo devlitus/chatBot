@@ -1,15 +1,15 @@
-import { sendMessage } from "@/services/post/sendMessage";
 import { useChatStore } from "@/stores/chat";
 import { useListModelStore } from "@/stores/listModel";
-import { useCallback, useState } from "react";
+import { sendMessage } from "@/services/post/sendMessage";
+import { useMessageStore } from "@/stores/message";
+import { useCallback } from "react";
 
 export function useMessage() {
-  const { chats, currentChatId, addMessage } = useChatStore();
+  const { currentChatId, addMessage, chats } = useChatStore();
   const { selectedModel } = useListModelStore();
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchMessage = useCallback(async (currentMessage?: string) => {
+  const { setIsLoading, isLoading } = useMessageStore();
+  
+  const handleSendMessage = useCallback(async (currentMessage: string) => {
     if (!currentChatId) {
       console.warn('No active chat');
       return { success: false, error: 'No active chat' };
@@ -21,7 +21,6 @@ export function useMessage() {
     }
 
     setIsLoading(true);
-    setError(null);
 
     try {
       // Get current chat messages
@@ -40,7 +39,7 @@ export function useMessage() {
         ? [...recentMessages, { role: 'user', content: currentMessage }]
         : recentMessages;
 
-      console.log('Sending messages to API:', messagesToSend); // Debug log
+      console.log('Sending messages to API:', messagesToSend);
 
       // Send messages to API
       const response = await sendMessage({
@@ -48,7 +47,7 @@ export function useMessage() {
         messages: messagesToSend
       });
 
-      console.log('Received response:', response); // Debug log
+      console.log('Received response:', response);
       
       // Add assistant's response to chat
       if (response && typeof response === 'string') {
@@ -57,23 +56,33 @@ export function useMessage() {
           content: response.trim() 
         });
         
-        // Guardar en localStorage se maneja automáticamente en el store
-        
         setIsLoading(false);
         return { success: true, data: response.trim() };
-      } else {
-        console.error('Invalid response from assistant:', response);
-        setError('Respuesta inválida del asistente');
-        setIsLoading(false);
-        return { success: false, error: 'Invalid response from assistant' };
       }
-    } catch (error) {
-      console.error('Failed to fetch message:', error);
-      setError('Error al obtener respuesta');
-      setIsLoading(false);
-      return { success: false, error: 'Failed to fetch message' };
-    }
-  }, [addMessage, selectedModel, chats, currentChatId]); 
 
-  return { fetchMessage, isLoading, error };
+      setIsLoading(false);
+      return { success: false, error: 'Invalid response from API' };
+
+    } catch (error) {
+      console.error('Error sending message:', error);
+      setIsLoading(false);
+      return { success: false, error: 'Error sending message' };
+    }
+  }, [addMessage, selectedModel, chats, currentChatId, setIsLoading]);
+
+  // Mantener compatibilidad con la función fetchMessage
+  const fetchMessage = useCallback(async (currentMessage?: string) => {
+    const response = await handleSendMessage(currentMessage || '');
+    return {
+      success: response.success,
+      data: response.data,
+      error: response.error
+    };
+  }, [handleSendMessage]);
+
+  return {
+    handleSendMessage,
+    fetchMessage,
+    isLoading
+  };
 }
