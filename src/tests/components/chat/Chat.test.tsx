@@ -35,9 +35,9 @@ vi.mock("@/components/chat/components/MessageList", () => {
       const { isLoading } = getMockMessageStore();
       return (
         <div className="space-y-6" data-testid="message-list">
-          {messages.map((msg, index) => (
+          {messages.map((msg) => (
             <div
-              key={index}
+              key={msg.id}
               data-testid="message-wrapper"
               className={`flex ${
                 msg.role === "assistant" ? "justify-start" : "justify-end"
