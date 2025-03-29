@@ -1,4 +1,5 @@
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import type { Components } from "react-markdown";
 import { CodeBlock } from "./CodeBlock";
 import { 
@@ -61,7 +62,10 @@ const MarkdownComponents: Partial<Components> = {
 export function MessageContent({ content }: MessageContentProps) {
   return (
     <div className="prose prose-invert max-w-none">
-      <ReactMarkdown components={MarkdownComponents}>
+      <ReactMarkdown 
+        components={MarkdownComponents}
+        remarkPlugins={[remarkGfm]}
+      >
         {content}
       </ReactMarkdown>
     </div>
