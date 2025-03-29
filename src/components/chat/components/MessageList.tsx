@@ -1,5 +1,5 @@
 import { Message } from "./Message";
-import { MutableRefObject } from "react";
+import { RefObject } from "react";
 import Spinner from "@/components/ui/spinner/Spinner";
 import { useMessageStore } from "@/stores/message";
 
@@ -10,14 +10,14 @@ interface MessageType {
 
 interface MessageListProps {
   messages: MessageType[];
-  messagesEndRef: MutableRefObject<HTMLDivElement | null>;
+  messagesEndRef: RefObject<HTMLDivElement>;
 }
 
 export function MessageList({ messages, messagesEndRef }: MessageListProps) {
   const { isLoading } = useMessageStore();
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-testid="message-list">
       {messages.map((message, index) => (
         <Message key={index} role={message.role} content={message.content} />
       ))}
