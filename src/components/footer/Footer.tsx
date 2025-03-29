@@ -31,8 +31,6 @@ export function Footer() {
     // Enviar mensaje y comprobar respuesta
     const response = await fetchMessage(currentMessage);
 
-    // Si la respuesta es exitosa, los chats ya se han guardado en localStorage
-    // a través del store (saveChatsToLocalStorage)
     console.log("Respuesta del servicio:", response);
   };
 
