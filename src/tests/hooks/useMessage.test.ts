@@ -1,9 +1,9 @@
-import { renderHook } from '@testing-library/react';
-import { describe, expect, it, vi, beforeEach } from 'vitest';
+import { renderHook, act } from '@testing-library/react';
 import { useMessage } from '@/hooks/useMessage';
 import { useChatStore } from '@/stores/chat';
 import { useListModelStore } from '@/stores/listModel';
 import { useMessageStore } from '@/stores/message';
+import { vi, describe, expect, it, beforeEach } from 'vitest';
 
 // Mock the modules
 vi.mock('@/stores/chat');
@@ -16,6 +16,7 @@ vi.mock('@/services/post/sendMessage', () => ({
 describe('useMessage', () => {
   const mockAddMessage = vi.fn();
   const mockSetIsLoading = vi.fn();
+  const mockActivateChat = vi.fn();
   
   beforeEach(() => {
     vi.clearAllMocks();
@@ -25,9 +26,11 @@ describe('useMessage', () => {
       currentChatId: '123',
       chats: [{
         id: '123',
-        messages: []
+        messages: [],
+        isActive: false
       }],
-      addMessage: mockAddMessage
+      addMessage: mockAddMessage,
+      activateChat: mockActivateChat
     });
     
     vi.mocked(useListModelStore).mockReturnValue({
@@ -37,6 +40,89 @@ describe('useMessage', () => {
     vi.mocked(useMessageStore).mockReturnValue({
       setIsLoading: mockSetIsLoading,
       isLoading: false
+    });
+  });
+
+  it('should process pending messages in inactive chats', async () => {
+    // Mock an inactive chat with a pending user message
+    vi.mocked(useChatStore).mockReturnValue({
+      currentChatId: '123',
+      chats: [{
+        id: '123',
+        messages: [{ role: 'user', content: 'test message' }],
+        isActive: false
+      }],
+      addMessage: mockAddMessage,
+      activateChat: mockActivateChat
+    });
+
+    renderHook(() => useMessage());
+
+    // Wait for the effect to process the pending message
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 0));
+    });
+
+    expect(mockAddMessage).toHaveBeenCalledWith({
+      role: 'assistant',
+      content: 'AI response'
+    });
+    expect(mockActivateChat).toHaveBeenCalledWith('123');
+  });
+
+  it('should not process messages in active chats', async () => {
+    // Mock an active chat with a message
+    vi.mocked(useChatStore).mockReturnValue({
+      currentChatId: '123',
+      chats: [{
+        id: '123',
+        messages: [{ role: 'user', content: 'test message' }],
+        isActive: true
+      }],
+      addMessage: mockAddMessage,
+      activateChat: mockActivateChat
+    });
+
+    renderHook(() => useMessage());
+
+    // Wait for any potential effects
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 0));
+    });
+
+    expect(mockAddMessage).not.toHaveBeenCalled();
+    expect(mockActivateChat).not.toHaveBeenCalled();
+  });
+
+  it('should handle sending new messages', async () => {
+    const { result } = renderHook(() => useMessage());
+
+    await act(async () => {
+      const response = await result.current.handleSendMessage('new message');
+      expect(response.success).toBe(true);
+      expect(response.data).toBe('AI response');
+    });
+
+    expect(mockSetIsLoading).toHaveBeenCalledWith(true);
+    expect(mockAddMessage).toHaveBeenCalledWith({
+      role: 'assistant',
+      content: 'AI response'
+    });
+    expect(mockSetIsLoading).toHaveBeenCalledWith(false);
+  });
+
+  it('should maintain backwards compatibility with fetchMessage', async () => {
+    const { result } = renderHook(() => useMessage());
+
+    await act(async () => {
+      const response = await result.current.fetchMessage('test message');
+      expect(response.success).toBe(true);
+      expect(response.data).toBe('AI response');
+    });
+
+    expect(mockAddMessage).toHaveBeenCalledWith({
+      role: 'assistant',
+      content: 'AI response'
     });
   });
 

@@ -10,6 +10,7 @@ interface Chat {
   id: string;
   title: string;
   messages: Message[];
+  isActive: boolean;
 }
 
 interface ChatStore {
@@ -20,6 +21,7 @@ interface ChatStore {
   setCurrentChat: (chatId: string) => void;
   addMessage: (message: Message) => void;
   loadChats: () => void;
+  activateChat: (chatId: string) => void;
 }
 
 const saveChatsToLocalStorage = (chats: Chat[]) => {
@@ -35,24 +37,15 @@ export const useChatStore = create<ChatStore>((set) => ({
     if (savedChats) {
       const chats = JSON.parse(savedChats);
       set({ chats, currentChatId: chats[0]?.id || null });
-    } else {
-      // Si no hay chats guardados, crear uno nuevo
-      const initialChat: Chat = {
-        id: uuidv4(),
-        title: `Chat ${new Date().toLocaleString()}`,
-        messages: []
-      };
-      const initialChats = [initialChat];
-      saveChatsToLocalStorage(initialChats);
-      set({ chats: initialChats, currentChatId: initialChat.id });
-    }
+    } 
   },
 
   addChat: () => {
     const newChat: Chat = {
       id: uuidv4(),
       title: `Chat ${new Date().toLocaleString()}`,
-      messages: []
+      messages: [],
+      isActive: false
     };
 
     set((state) => {
@@ -62,33 +55,46 @@ export const useChatStore = create<ChatStore>((set) => ({
     });
   },
 
-  deleteChat: (chatId: string) => set((state) => {
-    const newChats = state.chats.filter(chat => chat.id !== chatId);
-    saveChatsToLocalStorage(newChats);
-    return { 
-      chats: newChats,
-      currentChatId: chatId === state.currentChatId ? (newChats[0]?.id || null) : state.currentChatId
-    };
-  }),
+  deleteChat: (chatId: string) => {
+    set((state) => {
+      const newChats = state.chats.filter((chat) => chat.id !== chatId);
+      saveChatsToLocalStorage(newChats);
+      return {
+        chats: newChats,
+        currentChatId: newChats.length > 0 ? newChats[0].id : null,
+      };
+    });
+  },
 
   setCurrentChat: (chatId: string) => {
     set({ currentChatId: chatId });
   },
 
-  addMessage: (message: Message) => set((state) => {
-    if (!state.currentChatId) return state;
-
-    const newChats = state.chats.map(chat => {
-      if (chat.id === state.currentChatId) {
-        return {
-          ...chat,
-          messages: [...chat.messages, message]
-        };
-      }
-      return chat;
+  activateChat: (chatId: string) => {
+    set((state) => {
+      const newChats = state.chats.map(chat => 
+        chat.id === chatId ? { ...chat, isActive: true } : chat
+      );
+      saveChatsToLocalStorage(newChats);
+      return { chats: newChats };
     });
+  },
 
-    saveChatsToLocalStorage(newChats);
-    return { chats: newChats };
-  }),
+  addMessage: (message: Message) => {
+    set((state) => {
+      if (!state.currentChatId) return state;
+
+      const newChats = state.chats.map((chat) =>
+        chat.id === state.currentChatId
+          ? {
+              ...chat,
+              messages: [...chat.messages, message],
+            }
+          : chat
+      );
+
+      saveChatsToLocalStorage(newChats);
+      return { chats: newChats };
+    });
+  },
 }));
