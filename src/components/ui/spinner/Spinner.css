@@ -6,15 +6,44 @@
 }
 
 .spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #3498db;
+  display: inline-block;
+  border: 2px solid rgba(0, 0, 0, 0.1);
   border-radius: 50%;
+  border-top: 2px solid #3498db;
   animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+/* Dark mode support */
+.dark .spinner {
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-top: 2px solid #64b5f6;
+}
+
+/* Size variants */
+.spinner.sm {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.spinner.md {
+  width: 2rem;
+  height: 2rem;
+}
+
+.spinner.lg {
+  width: 3rem;
+  height: 3rem;
+}
+
+/* Responsive adjustments */
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation: none;
+    border-top: 2px solid rgba(0, 0, 0, 0.1);
+  }
 }

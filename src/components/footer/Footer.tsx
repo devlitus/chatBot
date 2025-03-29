@@ -42,7 +42,7 @@ export function Footer() {
   };
 
   return (
-    <div className="max-w-[1280px] mx-auto flex items-center gap-4 p-4 ">
+    <div className="max-w-[1560px] mx-auto flex items-center gap-4 p-4 ">
       <Button variant="primary" className="flex items-center gap-2">
         <Upload />
       </Button>
