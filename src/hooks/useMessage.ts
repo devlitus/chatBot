@@ -2,10 +2,10 @@ import { useChatStore } from "@/stores/chat";
 import { useListModelStore } from "@/stores/listModel";
 import { sendMessage } from "@/services/post/sendMessage";
 import { useMessageStore } from "@/stores/message";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 
 export function useMessage() {
-  const { currentChatId, addMessage, chats } = useChatStore();
+  const { currentChatId, addMessage, chats, activateChat } = useChatStore();
   const { selectedModel } = useListModelStore();
   const { setIsLoading, isLoading } = useMessageStore();
   
@@ -15,7 +15,7 @@ export function useMessage() {
       return { success: false, error: 'No active chat' };
     }
 
-    if (selectedModel === "Modelos LLM") {
+    if (selectedModel === "Modelos LLM") {  
       console.warn('No model selected');
       return { success: false, error: 'No model selected' };
     }
@@ -69,6 +69,24 @@ export function useMessage() {
       return { success: false, error: 'Error sending message' };
     }
   }, [addMessage, selectedModel, chats, currentChatId, setIsLoading]);
+
+  // Observar cambios en el localStorage para mensajes pendientes
+  useEffect(() => {
+    const checkPendingMessages = async () => {
+      const currentChat = chats.find(chat => chat.id === currentChatId);
+      if (!currentChat || currentChat.isActive) return;
+
+      const lastMessage = currentChat.messages[currentChat.messages.length - 1];
+      if (lastMessage?.role === 'user') {
+        // Hay un mensaje de usuario pendiente, procesarlo
+        await handleSendMessage(lastMessage.content);
+        activateChat(currentChat.id);
+      }
+    };
+
+    // Verificar mensajes pendientes cuando cambia el chat actual o los mensajes
+    checkPendingMessages();
+  }, [currentChatId, chats, activateChat, handleSendMessage]);
 
   // Mantener compatibilidad con la función fetchMessage
   const fetchMessage = useCallback(async (currentMessage?: string) => {

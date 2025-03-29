@@ -1,5 +1,6 @@
+import { ModelOption } from "@/types/modelOptions";
 import { create } from "zustand";
-import { ModelOption } from "../types/modelOtions";
+
 
 interface ListModelStore {
   listModels: ModelOption[];
