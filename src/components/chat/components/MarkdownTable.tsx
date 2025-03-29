@@ -19,7 +19,9 @@ export const TableBody = ({ children }: MarkdownComponentProps) => (
 );
 
 export const TableRow = ({ children }: MarkdownComponentProps) => (
-  <tr className="transition-colors hover:bg-[var(--color-bg-secondary)] bg-opacity-50">{children}</tr>
+  <tr className="transition-colors hover:bg-[var(--color-bg-secondary)] bg-opacity-50">
+    {children}
+  </tr>
 );
 
 export const TableHeader = ({ children }: MarkdownComponentProps) => (
