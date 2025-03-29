@@ -6,7 +6,10 @@ interface SendMessageParams {
   messages: ChatMessage[];
 }
 
-export async function sendMessage({ model, messages }: SendMessageParams): Promise<string> {
+/**
+ * Envía un mensaje al servicio de chat
+ */
+export async function sendMessage({ model, messages }: SendMessageParams): Promise<string | undefined> {
   
   try {
     const response = await fetch(GROQ_URL_COMPLETION, {
@@ -20,6 +23,9 @@ export async function sendMessage({ model, messages }: SendMessageParams): Promi
         messages: messages
       })
     });  
+    if (!response.ok) {
+      throw new Error(`Error en la API: ${response.status}`);
+    }
     const data = await response.json() as ChatResponse;
     return mapChatResponse(data);
   } catch (error) {
@@ -28,11 +34,9 @@ export async function sendMessage({ model, messages }: SendMessageParams): Promi
   }
 }
 
-function mapChatResponse(response: ChatResponse): string {
-  console.log(response);
+function mapChatResponse(response: ChatResponse): string | undefined {
   if (!response.choices || response.choices.length === 0) {
     throw new Error('No response choices available');
   }
   return response.choices[0].message.content;
-  }
-  
+}
