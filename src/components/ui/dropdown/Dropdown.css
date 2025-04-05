@@ -120,9 +120,8 @@
 }
 
 .dropdown-item:hover .model-name {
-  color: var(--color-primary);
+  color: var(--color-accent);
 }
-
 .model-company {
   color: var(--color-text-secondary);
   transition: opacity 0.2s;

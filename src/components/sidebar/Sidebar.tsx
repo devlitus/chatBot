@@ -27,7 +27,7 @@ export function Sidebar() {
       const firstUserMessage = chat.messages.find((m) => m.role === "user");
       newTitles[chat.id] = firstUserMessage
         ? getFirstFiveWords(firstUserMessage.content)
-        : "";
+        : "Chat sin título";
     });
     setChatTitles(newTitles);
   }, [chats]);

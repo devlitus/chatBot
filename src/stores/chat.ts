@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { v4 as uuidv4 } from 'uuid';
+import { v7 } from 'uuid';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -42,7 +42,7 @@ export const useChatStore = create<ChatStore>((set) => ({
 
   addChat: () => {
     const newChat: Chat = {
-      id: uuidv4(),
+      id: v7(),
       title: `Chat ${new Date().toLocaleString()}`,
       messages: [],
       isActive: false
