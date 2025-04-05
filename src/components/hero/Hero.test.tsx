@@ -1,12 +1,12 @@
 import { describe, expect, test, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { Hero } from '../../../components/hero/Hero';
+import { Hero } from './Hero';
 
-vi.mock('../../../components/ui/dropdown/Dropdown', () => ({
+vi.mock('@/components/ui/dropdown/Dropdown', () => ({
   Dropdown: () => <div data-testid="dropdown">Dropdown</div>,
 }));
 
-vi.mock('../../../components/ui/switch/Switch', () => ({
+vi.mock('@/components/ui/switch/Switch', () => ({
   Switch: () => <div data-testid="switch">Switch</div>,
 }));
 
