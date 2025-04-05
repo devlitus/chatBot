@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { CodeBlock } from '../../../../components/chat/components/CodeBlock';
+import { CodeBlock } from '../../../../components/chat/components/codeBlock/CodeBlock';
 
 describe('CodeBlock', () => {
   it('should render inline code correctly', () => {
@@ -14,7 +14,7 @@ describe('CodeBlock', () => {
     render(
       <CodeBlock data-testid="code-block" className="language-javascript">
         const test = "hello";
-      </CodeBlock>
+      </CodeBlock>,
     );
     // Check for the container div with rounded corners
     const container = screen.getByTestId('code-block');
@@ -22,7 +22,7 @@ describe('CodeBlock', () => {
     expect(container.textContent).toContain('const test = "hello"');
     // Verify the outer container has the correct class
     expect(container).toHaveClass('rounded-md');
-    
+
     // Get the inner SyntaxHighlighter div (it uses a code element)
     const syntaxHighlighter = container.querySelector('code');
     expect(syntaxHighlighter).not.toBeNull();
@@ -32,7 +32,7 @@ describe('CodeBlock', () => {
     render(
       <CodeBlock data-testid="code-block" className="language-javascript">
         const test = "hello";
-      </CodeBlock>
+      </CodeBlock>,
     );
     // Use textContent to check the actual rendered text
     const container = screen.getByTestId('code-block');
@@ -40,7 +40,9 @@ describe('CodeBlock', () => {
   });
 
   it('should handle missing language gracefully', () => {
-    render(<CodeBlock data-testid="code-block">const test = "hello";</CodeBlock>);
+    render(
+      <CodeBlock data-testid="code-block">const test = "hello";</CodeBlock>,
+    );
     const codeElement = screen.getByText('const test = "hello";');
     expect(codeElement.tagName).toBe('CODE');
   });
@@ -49,7 +51,7 @@ describe('CodeBlock', () => {
     render(
       <CodeBlock data-testid="code-block" className="language-javascript">
         const test = "hello";
-      </CodeBlock>
+      </CodeBlock>,
     );
     const element = screen.getByTestId('code-block');
     expect(element).toBeInTheDocument();

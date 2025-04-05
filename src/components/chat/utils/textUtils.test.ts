@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getFirstFiveWords } from '../../../../components/chat/utils/textUtils';
+import { getFirstFiveWords } from './textUtils';
 
 describe('textUtils', () => {
   describe('getFirstFiveWords', () => {

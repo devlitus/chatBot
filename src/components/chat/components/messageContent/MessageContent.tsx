@@ -1,7 +1,7 @@
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import type { Components } from "react-markdown";
-import { CodeBlock } from "./CodeBlock";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import type { Components } from 'react-markdown';
+import { CodeBlock } from '../codeBlock/CodeBlock';
 import {
   Table,
   TableHead,
@@ -9,7 +9,7 @@ import {
   TableRow,
   TableHeader,
   TableCell,
-} from "./MarkdownTable";
+} from '../markdownTable/MarkdownTable';
 
 interface MessageContentProps {
   content: string;

@@ -7,7 +7,7 @@ import {
   TableRow,
   TableHeader,
   TableCell,
-} from '../../../../components/chat/components/MarkdownTable';
+} from '../../../../components/chat/components/markdownTable/MarkdownTable';
 
 describe('MarkdownTable Components', () => {
   describe('Table Component', () => {
@@ -15,21 +15,30 @@ describe('MarkdownTable Components', () => {
       render(
         <Table>
           <tbody>
-            <tr><td>Test Content</td></tr>
+            <tr>
+              <td>Test Content</td>
+            </tr>
           </tbody>
-        </Table>
+        </Table>,
       );
       const table = screen.getByRole('table');
-      expect(table).toHaveClass('min-w-full', 'border-collapse', 'border', 'text-sm');
+      expect(table).toHaveClass(
+        'min-w-full',
+        'border-collapse',
+        'border',
+        'text-sm',
+      );
     });
 
     it('should render children correctly', () => {
       render(
         <Table>
           <tbody>
-            <tr><td>Test Content</td></tr>
+            <tr>
+              <td>Test Content</td>
+            </tr>
           </tbody>
-        </Table>
+        </Table>,
       );
       expect(screen.getByText('Test Content')).toBeInTheDocument();
     });
@@ -40,9 +49,11 @@ describe('MarkdownTable Components', () => {
       render(
         <table>
           <TableHead>
-            <tr><th>Header</th></tr>
+            <tr>
+              <th>Header</th>
+            </tr>
           </TableHead>
-        </table>
+        </table>,
       );
       const thead = screen.getByRole('rowgroup');
       expect(thead).toHaveClass('bg-[var(--color-bg-secondary)]');
@@ -54,9 +65,11 @@ describe('MarkdownTable Components', () => {
       render(
         <table>
           <TableBody>
-            <tr><td>Body Content</td></tr>
+            <tr>
+              <td>Body Content</td>
+            </tr>
           </TableBody>
-        </table>
+        </table>,
       );
       const tbody = screen.getByRole('rowgroup');
       expect(tbody).toHaveClass('divide-y', 'divide-[var(--color-accent)]');
@@ -72,10 +85,14 @@ describe('MarkdownTable Components', () => {
               <td>Row Content</td>
             </TableRow>
           </tbody>
-        </table>
+        </table>,
       );
       const row = screen.getByRole('row');
-      expect(row).toHaveClass('transition-colors', 'hover:bg-[var(--color-bg-secondary)]', 'bg-opacity-50');
+      expect(row).toHaveClass(
+        'transition-colors',
+        'hover:bg-[var(--color-bg-secondary)]',
+        'bg-opacity-50',
+      );
     });
   });
 
@@ -88,7 +105,7 @@ describe('MarkdownTable Components', () => {
               <TableHeader>Header Content</TableHeader>
             </tr>
           </thead>
-        </table>
+        </table>,
       );
       const header = screen.getByRole('columnheader');
       expect(header).toHaveClass(
@@ -99,7 +116,7 @@ describe('MarkdownTable Components', () => {
         'border-[var(--color-accent)]',
         'last:border-0',
         'font-semibold',
-        'whitespace-nowrap'
+        'whitespace-nowrap',
       );
     });
   });
@@ -113,7 +130,7 @@ describe('MarkdownTable Components', () => {
               <TableCell>Cell Content</TableCell>
             </tr>
           </tbody>
-        </table>
+        </table>,
       );
       const cell = screen.getByRole('cell');
       expect(cell).toHaveClass(
@@ -122,7 +139,7 @@ describe('MarkdownTable Components', () => {
         'border-r',
         'border-[var(--color-accent)]',
         'last:border-0',
-        'whitespace-nowrap'
+        'whitespace-nowrap',
       );
     });
 
@@ -134,7 +151,7 @@ describe('MarkdownTable Components', () => {
               <TableCell>123</TableCell>
             </tr>
           </tbody>
-        </table>
+        </table>,
       );
       const cell = screen.getByRole('cell');
       expect(cell).toHaveClass('[&:has(>:is(number))]:text-right');

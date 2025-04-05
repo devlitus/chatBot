@@ -1,10 +1,10 @@
-import { Message } from "./Message";
-import { RefObject } from "react";
-import Spinner from "@/components/ui/spinner/Spinner";
-import { useMessageStore } from "@/stores/message";
+import { RefObject } from 'react';
+import Spinner from '@/components/ui/spinner/Spinner';
+import { useMessageStore } from '@/stores/message';
+import { Message } from '../message/Message';
 
 interface MessageType {
-  role: "user" | "assistant";
+  role: 'user' | 'assistant';
   content: string;
 }
 
