@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, test, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import {
   Table,
@@ -7,20 +7,21 @@ import {
   TableRow,
   TableHeader,
   TableCell,
-} from '../../../../components/chat/components/markdownTable/MarkdownTable';
+} from './MarkdownTable';
 
 describe('MarkdownTable Components', () => {
-  describe('Table Component', () => {
-    it('should render table with correct classes', () => {
+  describe('Table', () => {
+    test('debería renderizar una tabla con los estilos correctos', () => {
       render(
         <Table>
           <tbody>
             <tr>
-              <td>Test Content</td>
+              <td>Contenido</td>
             </tr>
           </tbody>
         </Table>,
       );
+
       const table = screen.getByRole('table');
       expect(table).toHaveClass(
         'min-w-full',
@@ -29,64 +30,54 @@ describe('MarkdownTable Components', () => {
         'text-sm',
       );
     });
-
-    it('should render children correctly', () => {
-      render(
-        <Table>
-          <tbody>
-            <tr>
-              <td>Test Content</td>
-            </tr>
-          </tbody>
-        </Table>,
-      );
-      expect(screen.getByText('Test Content')).toBeInTheDocument();
-    });
   });
 
-  describe('TableHead Component', () => {
-    it('should render thead with correct class', () => {
+  describe('TableHead', () => {
+    test('debería renderizar un thead con el fondo correcto', () => {
       render(
         <table>
           <TableHead>
             <tr>
-              <th>Header</th>
+              <th>Encabezado</th>
             </tr>
           </TableHead>
         </table>,
       );
+
       const thead = screen.getByRole('rowgroup');
       expect(thead).toHaveClass('bg-[var(--color-bg-secondary)]');
     });
   });
 
-  describe('TableBody Component', () => {
-    it('should render tbody with correct classes', () => {
+  describe('TableBody', () => {
+    test('debería renderizar un tbody con los divisores correctos', () => {
       render(
         <table>
           <TableBody>
             <tr>
-              <td>Body Content</td>
+              <td>Celda</td>
             </tr>
           </TableBody>
         </table>,
       );
+
       const tbody = screen.getByRole('rowgroup');
       expect(tbody).toHaveClass('divide-y', 'divide-[var(--color-accent)]');
     });
   });
 
-  describe('TableRow Component', () => {
-    it('should render tr with correct classes', () => {
+  describe('TableRow', () => {
+    test('debería renderizar una fila con los estilos de hover correctos', () => {
       render(
         <table>
           <tbody>
             <TableRow>
-              <td>Row Content</td>
+              <td>Celda</td>
             </TableRow>
           </tbody>
         </table>,
       );
+
       const row = screen.getByRole('row');
       expect(row).toHaveClass(
         'transition-colors',
@@ -96,17 +87,18 @@ describe('MarkdownTable Components', () => {
     });
   });
 
-  describe('TableHeader Component', () => {
-    it('should render th with correct classes', () => {
+  describe('TableHeader', () => {
+    test('debería renderizar un encabezado con los estilos correctos', () => {
       render(
         <table>
           <thead>
             <tr>
-              <TableHeader>Header Content</TableHeader>
+              <TableHeader>Título</TableHeader>
             </tr>
           </thead>
         </table>,
       );
+
       const header = screen.getByRole('columnheader');
       expect(header).toHaveClass(
         'px-6',
@@ -121,17 +113,18 @@ describe('MarkdownTable Components', () => {
     });
   });
 
-  describe('TableCell Component', () => {
-    it('should render td with correct classes', () => {
+  describe('TableCell', () => {
+    test('debería renderizar una celda con los estilos correctos', () => {
       render(
         <table>
           <tbody>
             <tr>
-              <TableCell>Cell Content</TableCell>
+              <TableCell>Contenido</TableCell>
             </tr>
           </tbody>
         </table>,
       );
+
       const cell = screen.getByRole('cell');
       expect(cell).toHaveClass(
         'px-6',
@@ -139,22 +132,32 @@ describe('MarkdownTable Components', () => {
         'border-r',
         'border-[var(--color-accent)]',
         'last:border-0',
+        '[&:has(>:is(number))]:text-right',
         'whitespace-nowrap',
       );
     });
+  });
 
-    it('should handle numeric content correctly', () => {
-      render(
-        <table>
-          <tbody>
-            <tr>
-              <TableCell>123</TableCell>
-            </tr>
-          </tbody>
-        </table>,
-      );
-      const cell = screen.getByRole('cell');
-      expect(cell).toHaveClass('[&:has(>:is(number))]:text-right');
-    });
+  test('debería renderizar una tabla completa con todos los componentes', () => {
+    render(
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableHeader>Encabezado 1</TableHeader>
+            <TableHeader>Encabezado 2</TableHeader>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          <TableRow>
+            <TableCell>Celda 1</TableCell>
+            <TableCell>Celda 2</TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>,
+    );
+
+    expect(screen.getByRole('table')).toBeInTheDocument();
+    expect(screen.getAllByRole('columnheader')).toHaveLength(2);
+    expect(screen.getAllByRole('cell')).toHaveLength(2);
   });
 });

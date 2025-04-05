@@ -1,6 +1,6 @@
 import { RefObject } from 'react';
-import Spinner from '@/components/ui/spinner/Spinner';
-import { useMessageStore } from '@/stores/message';
+import { Spinner } from '@/components/ui/spinner/Spinner';
+import { useMessageStore } from '@/stores/message/message';
 import { Message } from '../message/Message';
 
 interface MessageType {

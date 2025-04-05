@@ -1,9 +1,9 @@
-import { useListModelStore } from "@/stores/listModel";
-import { useMessageStore } from "@/stores/message";
+import { useListModelStore } from "@/stores/listModel/listModel";
+import { useMessageStore } from "@/stores/message/message";
 import { useCallback, useEffect } from "react";
 import { MessageService } from "@/services/messages/messageService";
 import { MessageResponse } from "@/types/message";
-import { useChatStore } from "@/stores/chat";
+import { useChatStore } from "@/stores/chat/chat";
 
 /**
  * Hook para manejar el envío y recepción de mensajes

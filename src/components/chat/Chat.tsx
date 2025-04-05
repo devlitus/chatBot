@@ -1,7 +1,7 @@
-import { useChatStore } from '@/stores/chat';
+import { useChatStore } from '@/stores/chat/chat';
 import { useEffect, useRef, useMemo } from 'react';
 import { MessageList } from './components/messageList/MessageList';
-import { useListModelStore } from '@/stores/listModel';
+import { useListModelStore } from '@/stores/listModel/listModel';
 
 export function Chat() {
   const { chats, currentChatId } = useChatStore();

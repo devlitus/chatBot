@@ -1,6 +1,6 @@
-import { useThemeStore } from "../../../stores/theme";
-import { Moon } from "../../icons/Moon";
-import { Sun } from "../../icons/Sun";
+import { useThemeStore } from '../../../stores/theme/theme';
+import { Moon } from '../../icons/Moon';
+import { Sun } from '../../icons/Sun';
 
 export function Switch() {
   const { isDark, toggleTheme } = useThemeStore();
@@ -12,12 +12,12 @@ export function Switch() {
         transition-all duration-200
         ${
           isDark
-            ? "bg-[var(--color-primary)] text-[var(--color-light)] hover:bg-[var(--color-primary)]"
-            : "bg-[var(--color-primary)] text-[var(--color-text-light)] hover:bg-[var(--color-accent)]"
+            ? 'bg-[var(--color-primary)] text-[var(--color-light)] hover:bg-[var(--color-primary)]'
+            : 'bg-[var(--color-primary)] text-[var(--color-text-light)] hover:bg-[var(--color-accent)]'
         }
       `}
       onClick={toggleTheme}
-      title={isDark ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
+      title={isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
     >
       {isDark ? <Moon /> : <Sun />}
     </button>

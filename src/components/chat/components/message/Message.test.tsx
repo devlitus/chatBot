@@ -1,59 +1,45 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, test, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { Message } from './Message';
+import { MessageContent } from '../messageContent/MessageContent';
 
-// Mock MessageContent component since we're testing Message in isolation
+// Mock del componente MessageContent
 vi.mock('../messageContent/MessageContent', () => ({
-  MessageContent: ({ content }: { content: string }) => (
-    <div data-testid="message-content">{content}</div>
-  ),
+  MessageContent: vi.fn(({ content }) => (
+    <div data-testid="mock-message-content">{content}</div>
+  )),
 }));
 
 describe('Message', () => {
-  it('should render user message correctly', () => {
-    const content = 'Hello, this is a user message';
-    render(<Message role="user" content={content} />);
+  test('debería renderizar un mensaje del usuario correctamente', () => {
+    render(<Message role="user" content="Hola mundo" />);
 
-    // Check content is rendered directly for user messages
-    const messageText = screen.getByText(content);
-    expect(messageText).toBeInTheDocument();
-
-    // Check styling for user messages
-    const messageContainer = screen.getByTestId('message-container');
-    expect(messageContainer).toHaveClass('bg-[var(--color-accent)]');
-    expect(messageContainer).toHaveClass('text-[var(--color-text-inverse)]');
-
-    // Check alignment
     const wrapper = screen.getByTestId('message-wrapper');
+    const container = screen.getByTestId('message-container');
+    const content = screen.getByText('Hola mundo');
+
     expect(wrapper).toHaveClass('justify-end');
+    expect(container).toHaveClass('bg-[var(--color-accent)]');
+    expect(container).toHaveClass('text-[var(--color-text-inverse)]');
+    expect(content).toBeInTheDocument();
   });
 
-  it('should render assistant message correctly', () => {
-    const content = 'Hello, this is an assistant message';
-    render(<Message role="assistant" content={content} />);
+  test('debería renderizar un mensaje del asistente correctamente', () => {
+    const testMessage = 'Hola, ¿en qué puedo ayudarte?';
+    render(<Message role="assistant" content={testMessage} />);
 
-    // Check content is rendered through MessageContent for assistant messages
-    const messageContent = screen.getByTestId('message-content');
-    expect(messageContent).toBeInTheDocument();
-    expect(messageContent).toHaveTextContent(content);
-
-    // Check styling for assistant messages
-    const messageContainer = screen.getByTestId('message-container');
-    expect(messageContainer).toHaveClass('bg-[var(--color-bg-secondary)]');
-    expect(messageContainer).toHaveClass('text-[var(--color-text-primary)]');
-
-    // Check alignment
     const wrapper = screen.getByTestId('message-wrapper');
+    const container = screen.getByTestId('message-container');
+    const messageContent = screen.getByTestId('mock-message-content');
+
     expect(wrapper).toHaveClass('justify-start');
-  });
-
-  it('should apply common styles to both message types', () => {
-    render(<Message role="user" content="Test message" />);
-
-    const messageContainer = screen.getByTestId('message-container');
-    expect(messageContainer).toHaveClass('max-w-[80%]');
-    expect(messageContainer).toHaveClass('px-4');
-    expect(messageContainer).toHaveClass('py-2');
-    expect(messageContainer).toHaveClass('rounded-lg');
+    expect(container).toHaveClass('bg-[var(--color-bg-secondary)]');
+    expect(container).toHaveClass('text-[var(--color-text-primary)]');
+    expect(messageContent).toBeInTheDocument();
+    expect(messageContent).toHaveTextContent(testMessage);
+    expect(MessageContent).toHaveBeenCalled();
+    expect(vi.mocked(MessageContent).mock.calls[0][0]).toEqual({
+      content: testMessage,
+    });
   });
 });

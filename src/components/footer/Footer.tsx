@@ -1,19 +1,19 @@
-import { NoSend } from "../icons/NoSend";
-import { useChatStore } from "@/stores/chat";
-import { useState } from "react";
-import { useMessage } from "@/hooks/useMessage";
-import { useListModelStore } from "@/stores/listModel";
-import { Button } from "../ui/button/Button";
-import { Upload } from "../icons/Upload";
-import { Send } from "../icons/Send";
+import { NoSend } from '../icons/NoSend';
+import { useChatStore } from '@/stores/chat/chat';
+import { useState } from 'react';
+import { useMessage } from '@/hooks/message/useMessage';
+import { useListModelStore } from '@/stores/listModel/listModel';
+import { Button } from '../ui/button/Button';
+import { Upload } from '../icons/Upload';
+import { Send } from '../icons/Send';
 
 export function Footer() {
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState('');
   const { addMessage, currentChatId, addChat } = useChatStore();
   const { fetchMessage, isLoading } = useMessage();
   const { selectedModel } = useListModelStore();
 
-  const isInputDisabled = selectedModel === "Modelos LLM";
+  const isInputDisabled = selectedModel === 'Modelos LLM';
   const isSendDisabled = isInputDisabled || !message.trim() || isLoading;
 
   const handleSendMessage = async () => {
@@ -25,17 +25,17 @@ export function Footer() {
     }
 
     const currentMessage = message.trim();
-    addMessage({ role: "user", content: currentMessage });
-    setMessage("");
+    addMessage({ role: 'user', content: currentMessage });
+    setMessage('');
 
     // Enviar mensaje y comprobar respuesta
     const response = await fetchMessage(currentMessage);
 
-    console.log("Respuesta del servicio:", response);
+    console.log('Respuesta del servicio:', response);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
     }
@@ -63,6 +63,7 @@ export function Footer() {
           className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text-primary)]"
           onClick={handleSendMessage}
           disabled={isSendDisabled}
+          aria-label="enviar mensaje"
         >
           {isLoading ? (
             <div className="animate-spin h-5 w-5 border-2 border-[var(--color-accent)] border-t-transparent rounded-full"></div>

@@ -1,9 +1,9 @@
-import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import Spinner from '@/components/ui/spinner/Spinner';
+import { describe, expect, it } from 'vitest';
+import { Spinner } from './Spinner';
 
 describe('Spinner', () => {
-  it('debería renderizarse correctamente', () => {
+  it('debería renderizar correctamente', () => {
     render(<Spinner />);
     const spinner = screen.getByTestId('spinner');
     expect(spinner).toBeInTheDocument();
@@ -12,27 +12,27 @@ describe('Spinner', () => {
   it('debería aplicar el tamaño mediano por defecto', () => {
     render(<Spinner />);
     const spinner = screen.getByTestId('spinner');
-    expect(spinner.classList.contains('w-8')).toBe(true);
-    expect(spinner.classList.contains('h-8')).toBe(true);
+    expect(spinner.classList.contains('w-8')).toBeTruthy();
+    expect(spinner.classList.contains('h-8')).toBeTruthy();
   });
 
-  it('debería aplicar el tamaño pequeño cuando size="sm"', () => {
+  it('debería aplicar el tamaño pequeño cuando se especifica', () => {
     render(<Spinner size="sm" />);
     const spinner = screen.getByTestId('spinner');
-    expect(spinner.classList.contains('w-6')).toBe(true);
-    expect(spinner.classList.contains('h-6')).toBe(true);
+    expect(spinner.classList.contains('w-6')).toBeTruthy();
+    expect(spinner.classList.contains('h-6')).toBeTruthy();
   });
 
-  it('debería aplicar el tamaño grande cuando size="lg"', () => {
+  it('debería aplicar el tamaño grande cuando se especifica', () => {
     render(<Spinner size="lg" />);
     const spinner = screen.getByTestId('spinner');
-    expect(spinner.classList.contains('w-12')).toBe(true);
-    expect(spinner.classList.contains('h-12')).toBe(true);
+    expect(spinner.classList.contains('w-12')).toBeTruthy();
+    expect(spinner.classList.contains('h-12')).toBeTruthy();
   });
 
-  it('debería aplicar las clases personalizadas', () => {
-    render(<Spinner className="custom-class" />);
+  it('debería aplicar las clases personalizadas cuando se proporcionan', () => {
+    render(<Spinner className="test-class" />);
     const spinner = screen.getByTestId('spinner');
-    expect(spinner.classList.contains('custom-class')).toBe(true);
+    expect(spinner.classList.contains('test-class')).toBeTruthy();
   });
 });

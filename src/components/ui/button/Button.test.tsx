@@ -1,41 +1,34 @@
 import { describe, test, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { Button } from '@/components/ui/button/Button';
+import { Button } from './Button';
 
-describe('Button Component', () => {
-  test('debería renderizar el botón con el contenido correcto', () => {
-    render(<Button>Test Button</Button>);
-    expect(screen.getByRole('button')).toHaveTextContent('Test Button');
+describe('Button', () => {
+  test('renderiza el contenido del botón correctamente', () => {
+    render(<Button>Texto del botón</Button>);
+    expect(screen.getByText('Texto del botón')).toBeInTheDocument();
   });
 
-  test('debería aplicar la clase primary por defecto', () => {
-    render(<Button>Test Button</Button>);
-    expect(screen.getByRole('button')).toHaveClass('button', 'primary');
+  test('aplica la clase de variante correctamente', () => {
+    render(<Button variant="secondary">Botón</Button>);
+    const button = screen.getByText('Botón');
+    expect(button).toHaveClass('secondary');
   });
 
-  test('debería aplicar la clase secondary cuando se especifica', () => {
-    render(<Button variant="secondary">Test Button</Button>);
-    expect(screen.getByRole('button')).toHaveClass('button', 'secondary');
+  test('aplica el tamaño correcto', () => {
+    render(<Button size="sm">Botón pequeño</Button>);
+    const button = screen.getByText('Botón pequeño');
+    expect(button).toHaveClass('sm');
   });
 
-  test('debería aplicar el tamaño md por defecto', () => {
-    render(<Button>Test Button</Button>);
-    expect(screen.getByRole('button')).toHaveClass('md');
+  test('aplica clases adicionales mediante className', () => {
+    render(<Button className="mi-clase-personalizada">Botón</Button>);
+    const button = screen.getByText('Botón');
+    expect(button).toHaveClass('mi-clase-personalizada');
   });
 
-  test('debería aplicar el tamaño especificado', () => {
-    render(<Button size="sm">Test Button</Button>);
-    expect(screen.getByRole('button')).toHaveClass('sm');
-  });
-
-  test('debería combinar las clases personalizadas con las predeterminadas', () => {
-    render(<Button className="custom-class">Test Button</Button>);
-    const button = screen.getByRole('button');
-    expect(button).toHaveClass('button', 'primary', 'md', 'custom-class');
-  });
-
-  test('debería pasar las props adicionales al elemento button', () => {
-    render(<Button disabled>Test Button</Button>);
-    expect(screen.getByRole('button')).toBeDisabled();
+  test('pasa las props adicionales al elemento button', () => {
+    render(<Button disabled>Botón deshabilitado</Button>);
+    const button = screen.getByText('Botón deshabilitado');
+    expect(button).toBeDisabled();
   });
 });

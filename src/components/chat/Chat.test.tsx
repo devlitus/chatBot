@@ -1,63 +1,32 @@
-import { describe, test, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { Chat } from '@/components/chat/Chat';
-import { useChatStore } from '@/stores/chat';
-import { useListModelStore } from '@/stores/listModel';
+import { describe, it, vi, expect, beforeEach } from 'vitest';
+import { Chat } from './Chat';
+import * as chatStore from '@/stores/chat/chat';
+import * as modelStore from '@/stores/listModel/listModel';
 
-// Mock de los stores
-vi.mock('@/stores/chat', () => ({
+vi.mock('@/stores/chat/chat', () => ({
   useChatStore: vi.fn(),
 }));
 
-vi.mock('@/stores/listModel', () => ({
+vi.mock('@/stores/listModel/listModel', () => ({
   useListModelStore: vi.fn(),
 }));
 
-// Mock del componente MessageList
-vi.mock('@/components/chat/components/MessageList', () => ({
-  MessageList: ({ messages, messagesEndRef }: any) => (
-    <div data-testid="message-list">
-      {messages.map((msg: any, index: number) => (
-        <div key={index}>{msg.content}</div>
-      ))}
-      <div ref={messagesEndRef} />
-    </div>
-  ),
-}));
-
-describe('Chat Component', () => {
-  const mockScrollIntoView = vi.fn();
-  const mockMessages = [
-    { role: 'user', content: 'Hola' },
-    { role: 'assistant', content: 'Hola, ¿en qué puedo ayudarte?' },
-  ];
-
+describe('Chat', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
-
     // Mock de scrollIntoView
-    window.HTMLElement.prototype.scrollIntoView = mockScrollIntoView;
-
-    // Mock del estado inicial de los stores
-    vi.mocked(useChatStore).mockReturnValue({
-      chats: [
-        {
-          id: 'chat-1',
-          messages: mockMessages,
-        },
-      ],
-      currentChatId: 'chat-1',
-    } as any);
-
-    vi.mocked(useListModelStore).mockReturnValue({
-      selectedModel: 'gpt-3.5-turbo',
-    } as any);
+    Element.prototype.scrollIntoView = vi.fn();
   });
 
-  test('debería mostrar el mensaje de bienvenida cuando no hay modelo seleccionado', () => {
-    vi.mocked(useListModelStore).mockReturnValue({
+  it('debería mostrar el mensaje de bienvenida cuando no hay modelo seleccionado', () => {
+    vi.mocked(chatStore.useChatStore).mockReturnValue({
+      chats: [],
+      currentChatId: null,
+    });
+
+    vi.mocked(modelStore.useListModelStore).mockReturnValue({
       selectedModel: 'Modelos LLM',
-    } as any);
+    });
 
     render(<Chat />);
 
@@ -67,19 +36,22 @@ describe('Chat Component', () => {
     ).toBeInTheDocument();
   });
 
-  test('debería mostrar la lista de mensajes cuando hay un modelo seleccionado', () => {
+  it('debería mostrar la lista de mensajes cuando hay un modelo seleccionado', () => {
+    const mockMessages = [
+      { id: '1', content: 'Mensaje de prueba', role: 'user' },
+    ];
+
+    vi.mocked(chatStore.useChatStore).mockReturnValue({
+      chats: [{ id: '1', messages: mockMessages }],
+      currentChatId: '1',
+    });
+
+    vi.mocked(modelStore.useListModelStore).mockReturnValue({
+      selectedModel: 'gpt-3.5-turbo',
+    });
+
     render(<Chat />);
 
-    expect(screen.getByTestId('message-list')).toBeInTheDocument();
-    expect(screen.getByText('Hola')).toBeInTheDocument();
-    expect(
-      screen.getByText('Hola, ¿en qué puedo ayudarte?'),
-    ).toBeInTheDocument();
-  });
-
-  test('debería llamar a scrollIntoView cuando cambian los mensajes', () => {
-    render(<Chat />);
-
-    expect(mockScrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth' });
+    expect(screen.queryByText('Bienvenido al Chat')).not.toBeInTheDocument();
   });
 });

@@ -1,7 +1,7 @@
 import { Button } from '../ui/button/Button';
 import { Plus } from '../icons/Plus';
 import { Trash } from '../icons/Trash';
-import { useChatStore } from '../../stores/chat';
+import { useChatStore } from '../../stores/chat/chat';
 import { useEffect, useState } from 'react';
 import { getFirstFiveWords } from '../chat/utils/textUtils';
 
