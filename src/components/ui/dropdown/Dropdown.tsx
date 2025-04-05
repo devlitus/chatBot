@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
-import { Button } from "../button/Button";
-import "./Dropdown.css";
-import { ArrowDown } from "../../icons/ArrowDown";
-import { useDropdown } from "@/hooks/useDropdown";
-import { useListModelStore } from "@/stores/listModel";
-import { ModelResponse } from "@/types/modelResponse";
+import { useEffect, useState } from 'react';
+import { Button } from '../button/Button';
+import './Dropdown.css';
+import { ArrowDown } from '../../icons/ArrowDown';
+import { useDropdown } from '@/hooks/dropdown/useDropdown';
+import { useListModelStore } from '@/stores/listModel/listModel';
+import { ModelResponse } from '@/types/modelResponse';
 
 export function Dropdown() {
   const [isOpen, setIsOpen] = useState(false);
@@ -36,8 +36,8 @@ export function Dropdown() {
 
   // Determinar el texto a mostrar en el botón del dropdown
   const getDisplayText = () => {
-    if (selectedModel === "Modelos LLM") {
-      return "Seleccionar modelo LLM";
+    if (selectedModel === 'Modelos LLM') {
+      return 'Seleccionar modelo LLM';
     }
     return selectedModel;
   };
@@ -46,7 +46,7 @@ export function Dropdown() {
     <div className="dropdown">
       <Button
         variant="primary"
-        className={`dropdown-trigger ${isOpen ? "open" : ""}`}
+        className={`dropdown-trigger ${isOpen ? 'open' : ''}`}
         onClick={() => setIsOpen(!isOpen)}
       >
         {getDisplayText()}
@@ -74,7 +74,7 @@ export function Dropdown() {
                     variant="secondary"
                     size="sm"
                     className={`dropdown-item ${
-                      model.id === selectedModel ? "selected" : ""
+                      model.id === selectedModel ? 'selected' : ''
                     }`}
                     onClick={() => handleSelect(model.id)}
                   >

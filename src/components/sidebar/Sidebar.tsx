@@ -1,9 +1,9 @@
-import { Button } from "../ui/button/Button";
-import { Plus } from "../icons/Plus";
-import { Trash } from "../icons/Trash";
-import { useChatStore } from "../../stores/chat";
-import { useEffect, useState } from "react";
-import { getFirstFiveWords } from "../chat/utils/textUtils";
+import { Button } from '../ui/button/Button';
+import { Plus } from '../icons/Plus';
+import { Trash } from '../icons/Trash';
+import { useChatStore } from '../../stores/chat/chat';
+import { useEffect, useState } from 'react';
+import { getFirstFiveWords } from '../chat/utils/textUtils';
 
 export function Sidebar() {
   const {
@@ -24,10 +24,10 @@ export function Sidebar() {
   useEffect(() => {
     const newTitles: { [key: string]: string } = {};
     chats.forEach((chat) => {
-      const firstUserMessage = chat.messages.find((m) => m.role === "user");
+      const firstUserMessage = chat.messages.find((m) => m.role === 'user');
       newTitles[chat.id] = firstUserMessage
         ? getFirstFiveWords(firstUserMessage.content)
-        : "";
+        : 'Chat sin título';
     });
     setChatTitles(newTitles);
   }, [chats]);
@@ -35,7 +35,7 @@ export function Sidebar() {
   const handleDeleteChat = (e: React.MouseEvent, chatId: string) => {
     e.stopPropagation();
     if (
-      window.confirm("¿Estás seguro de que quieres eliminar esta conversación?")
+      window.confirm('¿Estás seguro de que quieres eliminar esta conversación?')
     ) {
       deleteChat(chatId);
     }
@@ -60,8 +60,8 @@ export function Sidebar() {
                 variant="secondary"
                 className={`w-full text-left truncate px-4 py-3 ${
                   currentChatId === chat.id
-                    ? "bg-[var(--color-accent)]"
-                    : "bg-transparent hover:bg-[var(--color-accent)]"
+                    ? 'bg-[var(--color-accent)]'
+                    : 'bg-transparent hover:bg-[var(--color-accent)]'
                 } text-[var(--color-text-primary)] transition-colors duration-200`}
                 onClick={() => setCurrentChat(chat.id)}
               >
