@@ -2,7 +2,6 @@ import { describe, test, expect, vi, beforeEach } from 'vitest';
 import { MessageService } from './messageService';
 import { sendMessage } from '../post/sendMessage';
 import { Message } from '@/types/message';
-import { KnownAsTypeMap } from 'vite';
 
 // Mock del módulo sendMessage
 vi.mock('../post/sendMessage', () => ({
