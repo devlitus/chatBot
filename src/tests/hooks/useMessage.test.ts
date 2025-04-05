@@ -1,7 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, test, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useMessage } from '@/hooks/useMessage';
 import { MessageService } from '@/services/messages/messageService';
+import { useChatStore } from '@/stores/chat';
 
 // Mock de los stores
 vi.mock('@/stores/chat', () => ({
@@ -50,7 +51,7 @@ describe('useMessage', () => {
   });
 
   describe('handleSendMessage', () => {
-    it('should handle successful message sending', async () => {
+    test('should handle successful message sending', async () => {
       // Mock setup
       vi.mocked(MessageService.validateMessageParams).mockReturnValue({ success: true });
       vi.mocked(MessageService.getRecentMessages).mockReturnValue([]);
@@ -74,7 +75,7 @@ describe('useMessage', () => {
       expect(response.data).toBe('API Response');
     });
 
-    it('should handle validation failure', async () => {
+    test('should handle validation failure', async () => {
       // Mock setup
       vi.mocked(MessageService.validateMessageParams).mockReturnValue({
         success: false,
@@ -93,7 +94,7 @@ describe('useMessage', () => {
       expect(response.error).toBe('Validation error');
     });
 
-    it('should handle API error', async () => {
+    test('should handle API error', async () => {
       // Mock setup
       vi.mocked(MessageService.validateMessageParams).mockReturnValue({ success: true });
       vi.mocked(MessageService.sendMessageToAPI).mockResolvedValue({
@@ -115,9 +116,9 @@ describe('useMessage', () => {
   });
 
   describe('fetchMessage', () => {
-    it('should return null for inactive chat', async () => {
-      // Mock setup with inactive chat
-      const mockUseChatStore = vi.fn(() => ({
+    test('should return null for inactive chat', async () => {
+      // Mock del chat store con un chat inactivo
+      vi.mocked(useChatStore).mockReturnValue({
         currentChatId: 'chat-1',
         chats: [
           {
@@ -125,12 +126,10 @@ describe('useMessage', () => {
             isActive: false,
             messages: []
           }
-        ]
-      }));
-
-      vi.mock('@/stores/chat', () => ({
-        useChatStore: mockUseChatStore
-      }));
+        ],
+        addMessage: vi.fn(),
+        activateChat: vi.fn()
+      });
 
       const { result } = renderHook(() => useMessage());
 
@@ -142,11 +141,29 @@ describe('useMessage', () => {
       expect(response.data).toBeNull();
     });
 
-    it('should forward message to handleSendMessage for active chat', async () => {
+    test('should forward message to handleSendMessage for active chat', async () => {
+      // Asegurar que el chat está activo
+      vi.mocked(useChatStore).mockReturnValue({
+        currentChatId: 'chat-1',
+        chats: [
+          {
+            id: 'chat-1',
+            isActive: true,
+            messages: []
+          }
+        ],
+        addMessage: vi.fn(),
+        activateChat: vi.fn()
+      });
+
       const { result } = renderHook(() => useMessage());
       const mockResponse = { success: true, data: 'Response' };
       
       vi.mocked(MessageService.validateMessageParams).mockReturnValue({ success: true });
+      vi.mocked(MessageService.getRecentMessages).mockReturnValue([]);
+      vi.mocked(MessageService.prepareMessagesToSend).mockReturnValue([
+        { role: 'user', content: 'Test message' }
+      ]);
       vi.mocked(MessageService.sendMessageToAPI).mockResolvedValue(mockResponse);
 
       // Execute

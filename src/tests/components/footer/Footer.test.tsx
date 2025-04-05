@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, expect, vi, beforeEach, test } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { Footer } from "@/components/footer/Footer";
 
@@ -11,7 +11,7 @@ describe("Footer Component", () => {
     vi.clearAllMocks();
   });
 
-  it("renders the component", () => {
+  test("renders the component", () => {
     render(<Footer />);
 
     // Verificar que el componente se renderiza
