@@ -1,3 +1,4 @@
+import { ChatResponse } from "@/types/chatResponse";
 import { ModelResponse } from "@/types/modelResponse";
 
 export const mockModelsList: ModelResponse[] = [
@@ -29,3 +30,31 @@ export const mockModelsList: ModelResponse[] = [
     public_apps: null
   }
 ];
+
+export const mockResponse: ChatResponse = {
+      id: 'test-id',
+      object: 'chat.completion',
+      created: 1234567890,
+      model: 'test-model',
+      choices: [
+        {
+          index: 0,
+          message: {
+            role: 'assistant',
+            content: 'Respuesta de prueba'
+          },
+          logprobs: null,
+          finish_reason: 'stop'
+        }
+      ],
+      usage: {
+        queue_time: 100,
+        prompt_tokens: 10,
+        prompt_time: 50,
+        completion_tokens: 20,
+        completion_time: 50,
+        total_tokens: 30,
+        total_time: 100
+      },
+      system_fingerprint: 'test-fingerprint'
+    };
