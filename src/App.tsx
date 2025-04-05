@@ -17,6 +17,7 @@ export function App() {
   return (
     <div className="flex h-svh ">
       <aside
+        role="complementary"
         className={`transition-all duration-300 ease-in-out bg-[var(--color-surface)] ${
           isSidebarOpen
             ? 'w-[280px] min-w-[280px]'
