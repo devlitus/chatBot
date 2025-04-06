@@ -5,3 +5,4 @@ export const GROQ_API_KEY: string = import.meta.env.VITE_GROQ_API_KEY;
 export const SUPABASE_URL: string = import.meta.env.VITE_SUPABASE_URL;
 export const SUPABASE_ANON_KEY: string = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
+export const SENTRY_DSN: string = import.meta.env.VITE_SENTRY_DSN;

@@ -25,7 +25,6 @@ export function App() {
       >
         <Sidebar />
       </aside>
-
       <div className="flex-1 flex flex-col h-full bg-[var(--color-surface)]">
         <header className="w-full">
           <Hero
