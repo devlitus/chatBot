@@ -1,7 +1,7 @@
 import { describe, test, expect } from 'vitest';
 import { filterModelsByCompany, groupModelsByCompany, getCompanyDisplayName, sortModelsById, sortByLabel, transformToModelOptions } from './modelTransformers';
 import { ModelOption } from '@/types/modelOptions';
-import { mockModelsList } from '@/tests/mocks/modelResponseMock';
+import { mockModelsList } from '@/mocks/modelResponseMock';
 
 describe('modelTransformers', () => {
 

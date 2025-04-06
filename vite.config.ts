@@ -19,6 +19,24 @@ export default defineConfig({
       project: 'consulting',
     }),
   ],
+  envDir: './env',
+  envPrefix: 'VITE_',
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: ['./src/setupTest.ts'],
+    include: ['src/**/*.{test,spec}.{ts,tsx}'],
+    coverage: {
+      reporter: ['text', 'json', 'html'],
+      exclude: [
+        'src/**/*.test.tsx',
+        'src/**/*.test.ts',
+        'src/setupTest.ts',
+        'src/vite.config.ts',
+        
+      ],
+    },
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

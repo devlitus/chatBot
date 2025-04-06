@@ -2,7 +2,7 @@ import { describe, test, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MessageList } from './MessageList';
 import { useMessageStore } from '@/stores/message/message';
-import { mockMessages } from '@/tests/mocks/messageMock';
+import { mockMessages } from '@/mocks/messageMock';
 
 // Mock del store de mensajes
 vi.mock('@/stores/message/message', () => ({
