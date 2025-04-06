@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { Dropdown } from './Dropdown';
 import { useListModelStore } from '@/stores/listModel/listModel';
 import { useDropdown } from '@/hooks/dropdown/useDropdown';
-import { mockModels } from '@/tests/mocks/modelMocks';
+import { mockModels } from '@/mocks/modelMocks';
 
 // Mock de los hooks
 vi.mock('@/hooks/dropdown/useDropdown');

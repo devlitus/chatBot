@@ -1,7 +1,7 @@
 import { describe, test, expect, vi, beforeEach } from 'vitest';
 import { sendMessage } from './sendMessage';
 import { ChatResponse } from '@/types/chatResponse';
-import { mockResponse } from '@/tests/mocks/modelResponseMock';
+import { mockResponse } from '@/mocks/modelResponseMock';
 
 describe('sendMessage', () => {
   beforeEach(() => {

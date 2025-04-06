@@ -1,7 +1,7 @@
 import { describe, test, expect, beforeEach, afterEach } from 'vitest';
 import { create } from 'zustand';
 import { useListModelStore, getSelectedModelFromLocalStorage, saveSelectedModelToLocalStorage } from './listModel';
-import { mockModels } from '@/tests/mocks/modelMocks';
+import { mockModels } from '@/mocks/modelMocks';
 
 type ListModelStore = {
   selectedModel: string;

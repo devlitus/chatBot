@@ -1,6 +1,6 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
 import { getListModels } from './getListModels';
-import { mockModels } from '@/tests/mocks/modelMocks';
+import { mockModels } from '@/mocks/modelMocks';
 import * as modelTransformers from '../models/modelTransformers';
 
 describe('getListModels', () => {

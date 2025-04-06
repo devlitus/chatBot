@@ -3,7 +3,7 @@ import { renderHook, act } from '@testing-library/react';
 import { useDropdown } from './useDropdown';
 import * as getListModelsModule from '@/services/get/getListModels';
 import { useListModelStore } from '@/stores/listModel/listModel';
-import { mockModels } from '@/tests/mocks/modelMocks';
+import { mockModels } from '@/mocks/modelMocks';
 
 vi.mock('@/services/get/getListModels');
 
