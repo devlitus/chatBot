@@ -74,20 +74,6 @@ export function Footer() {
           )}
         </button>
       </div>
-      <button
-        onClick={() => {
-          try {
-            throw new Error('This is your first error!');
-          } catch (error) {
-            captureError(error as Error, {
-              component: 'Footer',
-              action: 'Break the world button clicked',
-            });
-          }
-        }}
-      >
-        Break the world
-      </button>
     </div>
   );
 }
