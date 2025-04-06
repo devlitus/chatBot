@@ -18,7 +18,7 @@ export function Footer() {
   const isSendDisabled = isInputDisabled || !message.trim() || isLoading;
 
   const handleSendMessage = async () => {
-    if (isSendDisabled) {
+    if (!isSendDisabled) {
       captureError(new Error('El botón de enviar está deshabilitado'));
       return;
     }
