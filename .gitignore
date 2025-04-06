@@ -27,8 +27,7 @@ coverage
 # Environment variables
 .env
 .env.local
-.env.example
-.env.example.local
+.env.sentry-build-plugin
 
 # Dependencies
 yarn.lock

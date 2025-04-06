@@ -6,6 +6,7 @@ import { useListModelStore } from '@/stores/listModel/listModel';
 import { Button } from '../ui/button/Button';
 import { Upload } from '../icons/Upload';
 import { Send } from '../icons/Send';
+import { captureError } from '@/utils/sentry/sentryUtils';
 
 export function Footer() {
   const [message, setMessage] = useState('');
@@ -46,7 +47,6 @@ export function Footer() {
       <Button variant="primary" className="flex items-center gap-2">
         <Upload />
       </Button>
-
       <div className="flex-1 relative">
         <input
           type="text"
@@ -74,6 +74,20 @@ export function Footer() {
           )}
         </button>
       </div>
+      <button
+        onClick={() => {
+          try {
+            throw new Error('This is your first error!');
+          } catch (error) {
+            captureError(error as Error, {
+              component: 'Footer',
+              action: 'Break the world button clicked',
+            });
+          }
+        }}
+      >
+        Break the world
+      </button>
     </div>
   );
 }

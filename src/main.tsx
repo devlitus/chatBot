@@ -3,9 +3,17 @@ import { createRoot } from 'react-dom/client';
 import * as Sentry from '@sentry/react';
 import './global.css';
 import { App } from './App.tsx';
-
+import { SENTRY_DSN } from './constants.ts';
 Sentry.init({
-  dsn: 'https://0b214c2d7d6c13eb17f978ee0f5a02bd@o4508578388639744.ingest.de.sentry.io/4509101638549584',
+  dsn: SENTRY_DSN,
+  environment: import.meta.env.MODE,
+  tracesSampleRate: import.meta.env.MODE === 'production' ? 0.2 : 1.0,
+  beforeSend(event) {
+    if (import.meta.env.MODE !== 'production') {
+      console.log('Sentry event:', event);
+    }
+    return event;
+  },
 });
 
 createRoot(document.getElementById('root')!).render(

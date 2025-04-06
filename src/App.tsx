@@ -16,15 +16,6 @@ export function App() {
 
   return (
     <div className="flex h-svh ">
-      return{' '}
-      <button
-        onClick={() => {
-          throw new Error('This is your first error!');
-        }}
-      >
-        Break the world
-      </button>
-      ;
       <aside
         className={`transition-all duration-300 ease-in-out bg-[var(--color-surface)] ${
           isSidebarOpen
