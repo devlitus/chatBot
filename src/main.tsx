@@ -7,13 +7,12 @@ import { SENTRY_DSN } from './constants.ts';
 Sentry.init({
   dsn: SENTRY_DSN,
   environment: import.meta.env.MODE,
-  tracesSampleRate: import.meta.env.MODE === 'production' ? 0.2 : 1.0,
-  beforeSend(event) {
-    if (import.meta.env.MODE !== 'production') {
-      console.log('Sentry event:', event);
-    }
-    return event;
-  },
+  integrations: [Sentry.browserTracingIntegration()],
+  tracesSampleRate: 1.0,
+  tracePropagationTargets: [
+    'localhost',
+    'https://chat-bot-wine-five.vercel.app/',
+  ],
 });
 
 createRoot(document.getElementById('root')!).render(
