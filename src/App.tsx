@@ -1,46 +1,16 @@
-import { useEffect, useState } from 'react';
-import { Chat } from '@/components/chat/Chat';
-import { Footer } from '@/components/footer/Footer';
-import { Hero } from '@/components/hero/Hero';
-import { Sidebar } from '@/components/sidebar/Sidebar';
-import { useThemeStore } from '@/stores/theme/theme';
-import '@/styles/theme.css';
+import React from 'react';
+import { AppErrorBoundary } from './components/ErrorBoundary';
+// Importa tus otros componentes aquí
 
-export function App() {
-  const isDark = useThemeStore((state) => state.isDark);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-
-  useEffect(() => {
-    document.documentElement.classList.toggle('dark', isDark);
-  }, [isDark]);
-
+const App: React.FC = () => {
   return (
-    <div className="flex h-svh ">
-      <aside
-        className={`transition-all duration-300 ease-in-out bg-[var(--color-surface)] ${
-          isSidebarOpen
-            ? 'w-[280px] min-w-[280px]'
-            : 'w-0 min-w-0 overflow-hidden'
-        }`}
-      >
-        <Sidebar />
-      </aside>
-      <div className="flex-1 flex flex-col h-full bg-[var(--color-surface)]">
-        <header className="w-full">
-          <Hero
-            toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
-            isSidebarOpen={isSidebarOpen}
-          />
-        </header>
-
-        <main className="flex-1 overflow-auto bg-[var(--color-surface)]">
-          <Chat />
-        </main>
-
-        <footer className="w-full bg-[var(--color-surface)]">
-          <Footer />
-        </footer>
+    <AppErrorBoundary>
+      {/* Tu aplicación existente aquí */}
+      <div className="min-h-screen bg-gray-100">
+        {/* Contenido de tu aplicación */}
       </div>
-    </div>
+    </AppErrorBoundary>
   );
-}
+};
+
+export default App;
