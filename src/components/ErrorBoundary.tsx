@@ -2,7 +2,7 @@ import React from 'react';
 import { ErrorBoundary as SentryErrorBoundary } from '@sentry/react';
 
 interface FallbackProps {
-  error: Error;
+  error: Error | unknown;
   resetError(): void;
 }
 
@@ -15,7 +15,7 @@ const ErrorFallback: React.FC<FallbackProps> = ({ error, resetError }) => {
           Lo sentimos, ha ocurrido un error inesperado. Nuestro equipo ha sido notificado.
         </p>
         <div className="p-3 mb-4 overflow-auto text-left text-sm bg-gray-100 rounded max-h-32">
-          <pre className="text-red-500">{error.message}</pre>
+          <pre className="text-red-500">{error instanceof Error ? error.message : String(error)}</pre>
         </div>
         <button
           onClick={resetError}
