@@ -1,24 +1,26 @@
+import { SENTRY_DSN } from '@/constants';
 import * as Sentry from '@sentry/react';
 
 export const initSentry = () => {
   if (import.meta.env.PROD) {
     Sentry.init({
-      dsn: import.meta.env.VITE_SENTRY_DSN,
-      integrations: [
-        new Sentry.BrowserTracing({
-          // Set 'tracePropagationTargets' to control for which URLs distributed tracing should be enabled
-          tracePropagationTargets: ["localhost", /^https:\/\/yourserver\.io\/api/],
-        }),
-        new Sentry.Replay(),
-      ],
-      // Performance Monitoring
-      tracesSampleRate: 1.0, // Capture 100% of transactions in production
-      // Session Replay
-      replaysSessionSampleRate: 0.1, // Sample rate for session replays (10%)
-      replaysOnErrorSampleRate: 1.0, // Sample rate for errors (100%)
+      dsn: SENTRY_DSN,
       environment: import.meta.env.MODE,
-      release: import.meta.env.VITE_APP_VERSION || 'development',
-      enabled: import.meta.env.PROD,
+      integrations: [
+        Sentry.replayIntegration({
+          maskAllText: false,
+          blockAllMedia: false,
+        })
+      ],
+      replaysSessionSampleRate: 0.1,
+      replaysOnErrorSampleRate: 1.0,
+      tracesSampleRate: import.meta.env.MODE === 'production' ? 0.2 : 1.0,
+      beforeSend(event) {
+        if (import.meta.env.MODE !== 'production') {
+          console.log('Sentry event:', event);
+        }
+        return event;
+      },
     });
   }
 };
