@@ -6,7 +6,6 @@ import { useListModelStore } from '@/stores/listModel/listModel';
 import { Button } from '../ui/button/Button';
 import { Upload } from '../icons/Upload';
 import { Send } from '../icons/Send';
-import { captureError } from '@/utils/sentry/sentryUtils';
 
 export function Footer() {
   const [message, setMessage] = useState('');
@@ -45,7 +44,6 @@ export function Footer() {
       handleSendMessage();
     }
   };
-
   return (
     <div className="max-w-[1560px] mx-auto flex items-center gap-4 p-4 ">
       <Button variant="primary" className="flex items-center gap-2">
