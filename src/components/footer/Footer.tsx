@@ -6,7 +6,6 @@ import { useListModelStore } from '@/stores/listModel/listModel';
 import { Button } from '../ui/button/Button';
 import { Upload } from '../icons/Upload';
 import { Send } from '../icons/Send';
-import { captureError } from '@/utils/sentry/sentryUtils';
 
 export function Footer() {
   const [message, setMessage] = useState('');
