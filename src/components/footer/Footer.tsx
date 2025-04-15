@@ -41,7 +41,6 @@ export function Footer() {
       handleSendMessage();
     }
   };
-
   return (
     <div className="max-w-[1560px] mx-auto flex items-center gap-4 p-4 ">
       <Button variant="primary" className="flex items-center gap-2">
