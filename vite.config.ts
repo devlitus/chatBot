@@ -17,10 +17,13 @@ export default defineConfig({
     sentryVitePlugin({
       org: 'devlitus',
       project: 'consulting',
+      telemetry: false,
+      sourcemaps: {
+        assets: './dist/assets',
+        ignore: ['node_modules', 'vite.config.ts'],
+      },
     }),
   ],
-  envDir: './env',
-  envPrefix: 'VITE_',
   test: {
     globals: true,
     environment: 'jsdom',
