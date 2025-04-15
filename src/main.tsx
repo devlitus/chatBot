@@ -7,6 +7,14 @@ import { SENTRY_DSN } from './constants.ts';
 Sentry.init({
   dsn: SENTRY_DSN,
   environment: import.meta.env.MODE,
+  integrations: [
+    Sentry.replayIntegration({
+      maskAllText: false,
+      blockAllMedia: false,
+    })
+  ],
+  replaysSessionSampleRate: 0.1,
+  replaysOnErrorSampleRate: 1.0,
   tracesSampleRate: import.meta.env.MODE === 'production' ? 0.2 : 1.0,
   beforeSend(event) {
     if (import.meta.env.MODE !== 'production') {
@@ -15,7 +23,6 @@ Sentry.init({
     return event;
   },
 });
-
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />
