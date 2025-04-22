@@ -1,23 +1,36 @@
-import { useCallback } from "react";
+import { useEffect } from 'react';
 import { useListModelStore } from "@/stores/listModel/listModel";
-import { getListModels } from "@/services/get/getListModels";
+import { ModelOption } from "@/types/modelOptions";
+import { COMPANY_NAMES } from "@/types/modelOptions";
+import { ModelResponse } from "@/types/modelResponse";
 
-export function useDropdown() {
-  const { listModels, setListModels } = useListModelStore();
+export const useDropdown = () => {
+  const { listModels, fetchModels } = useListModelStore();
+
+  useEffect(() => {
+    fetchModels();
+  }, [fetchModels]);
   
-  const fetchModels = useCallback(async () => {
-    try {
-      const response = await getListModels();
-      if (response.length > 0) {
-        setListModels(response);
+  const organizeByCompany = (models: ModelResponse[]): ModelOption[] => {
+    // Agrupar modelos por compañía
+    const groupedByCompany = models.reduce<{ [key: string]: ModelResponse[] }>((acc, model) => {
+      const company = model.ownedBy.toLowerCase();
+      if (!acc[company]) {
+        acc[company] = [];
       }
-    } catch (error) {
-      console.error('Error fetching models:', error);
-    }
-  }, [setListModels]);
+      acc[company].push(model);
+      return acc;
+    }, {});
 
-  return {  
-    listModels,
-    fetchModels
-  }
-}
+    // Convertir a formato ModelOption[]
+    return Object.entries(groupedByCompany).map(([company, models]) => ({
+      label: COMPANY_NAMES[company] || company,
+      options: models
+    }));
+  };
+  const organizedModels = organizeByCompany(listModels);
+
+  return {
+    organizedModels
+  };
+};
