@@ -1,11 +1,9 @@
 import { create } from 'zustand';
-import type { Database } from '@/types/database.types';
 import { userService } from '@/services/supabase/userService';
-
-type User = Database['public']['Tables']['users']['Row'];
+import { IUser } from '@/types/user';
 
 interface UserState {
-  user: User | null;
+  user: IUser | null;
   isLoading: boolean;
   error: string | null;
   getUser: () => Promise<void>;

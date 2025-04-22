@@ -1,10 +1,8 @@
 import { supabase } from '@/utils/supabase';
-import type { Database } from '@/types/database.types';
-
-type User = Database['public']['Tables']['users']['Row'];
+import { type IUser, type DatabaseUser, mapDatabaseUserToUser } from '@/types/user';
 
 export const userService = {
-  async getSessionUser(): Promise<User | null> {
+  async getSessionUser(): Promise<IUser | null> {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session?.user?.id) {
       return null;
@@ -14,17 +12,17 @@ export const userService = {
       .from('users')
       .select()
       .eq('id', session.user.id)
-      .single();
+      .single<DatabaseUser>();
 
     if (error) {
       console.error('Error obteniendo usuario:', error);
       return null;
     }
 
-    return data;
+    return mapDatabaseUserToUser(data);
   },
 
-  async createAnonymousUser(): Promise<User | null> {
+  async createAnonymousUser(): Promise<IUser | null> {
     try {
       const { data: { user }, error: signInError } = await supabase.auth.signInAnonymously();
       if (signInError || !user) {
@@ -36,17 +34,18 @@ export const userService = {
         .from('users')
         .insert([{
           id: user.id,
-          name: 'Usuario Anónimo'
+          name: 'Usuario Anónimo',
+          is_anonymous: true
         }])
         .select()
-        .single();
+        .single<DatabaseUser>();
 
       if (insertError) {
         console.error('Error creando usuario en la base de datos:', insertError);
         return null;
       }
 
-      return data;
+      return mapDatabaseUserToUser(data);
     } catch (error) {
       console.error('Error en createAnonymousUser:', error);
       return null;
