@@ -1,65 +1,73 @@
 import { NoSend } from '../icons/NoSend';
 import { useChatStore } from '@/stores/chat/chat';
-import { useState } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useMessage } from '@/hooks/message/useMessage';
 import { useListModelStore } from '@/stores/listModel/listModel';
 import { Button } from '../ui/button/Button';
 import { Upload } from '../icons/Upload';
 import { Send } from '../icons/Send';
+import { useSupabaseAuth } from '@/hooks/auth/useSupabaseAuth';
 
 export function Footer() {
-  const [message, setMessage] = useState('');
-  const { addMessage, currentChatId, addChat } = useChatStore();
-  const { fetchMessage, isLoading } = useMessage();
-  const { selectedModel } = useListModelStore();
+  const [messageText, setMessageText] = useState('');
+  const { user } = useSupabaseAuth();
+  const { createChat, currentChat, sendMessage } = useChatStore();
+  const { isLoading } = useMessage();
+  const { selectedModel, loadUserPreference } = useListModelStore();
 
-  const isInputDisabled = selectedModel === 'Modelos LLM';
-  const isSendDisabled = isInputDisabled || !message.trim() || isLoading;
-
-  const handleSendMessage = async () => {
-    if (!message) {
-      console.log('El botón de enviar está deshabilitado');
-      return;
+  useEffect(() => {
+    if (user?.id) {
+      loadUserPreference();
     }
-    if (isSendDisabled) return;
+  }, [user?.id, loadUserPreference]);
 
-    // Si no hay un chat activo, crear uno nuevo
-    if (!currentChatId) {
-      addChat();
+  const isInputDisabled = selectedModel === 'Modelos LLM' || !user;
+  const isSendDisabled = isInputDisabled || !messageText.trim() || isLoading;
+
+  const handleSendMessage = useCallback(async () => {
+    const trimmedMessage = messageText.trim();
+    if (!trimmedMessage || !user?.id || isSendDisabled) return;
+
+    if (!currentChat) {
+      await createChat('Nuevo Chat', user.id);
     }
 
-    const currentMessage = message.trim();
-    addMessage({ role: 'user', content: currentMessage });
-    setMessage('');
+    setMessageText('');
+    await sendMessage(trimmedMessage, 'user');
 
-    // Enviar mensaje y comprobar respuesta
-    const response = await fetchMessage(currentMessage);
+    // TODO: Integrar con el servicio de IA para obtener la respuesta
+    const aiResponse = 'Esta es una respuesta temporal del asistente';
+    await sendMessage(aiResponse, 'assistant');
+  }, [messageText, user?.id, isSendDisabled, currentChat, createChat, sendMessage]);
 
-    console.log('Respuesta del servicio:', response);
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyPress = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
     }
-  };
+  }, [handleSendMessage]);
+
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setMessageText(e.target.value);
+  }, []);
+
   return (
-    <div className="max-w-[1560px] mx-auto flex items-center gap-4 p-4 ">
+    <div className="max-w-[1560px] mx-auto flex items-center gap-4 p-4">
       <Button variant="primary" className="flex items-center gap-2">
         <Upload />
       </Button>
       <div className="flex-1 relative">
         <input
           type="text"
-          placeholder="Escriba un mensaje..."
+          placeholder={isInputDisabled ? "Selecciona un modelo LLM para comenzar..." : "Escriba un mensaje..."}
           className="w-full p-3 rounded-lg bg-[var(--color-surface-secondary)] text-[var(--color-text-primary)] outline-none
           border border-[var(--color-secondary)] shadow-sm
-          focus:ring-2 focus:ring-[var(--color-accent)] focus:ring-opacity-50 focus:border-[var(--color-accent)] transition-all"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
+          focus:ring-2 focus:ring-[var(--color-accent)] focus:ring-opacity-50 focus:border-[var(--color-accent)] transition-all
+          disabled:opacity-50 disabled:cursor-not-allowed"
+          value={messageText}
+          onChange={handleInputChange}
           onKeyDown={handleKeyPress}
-          disabled={isInputDisabled || isLoading}
+          disabled={isInputDisabled}
         />
         <button
           className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text-primary)]"

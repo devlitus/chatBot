@@ -4,152 +4,127 @@ import { Dropdown } from './Dropdown';
 import { useListModelStore } from '@/stores/listModel/listModel';
 import { useDropdown } from '@/hooks/dropdown/useDropdown';
 import { mockModels } from '@/mocks/modelMocks';
+import { mockUser } from '@/mocks/userMocks';
+import { useSupabaseAuth } from '@/hooks/auth/useSupabaseAuth';
+import { User } from '@supabase/supabase-js';
 
-// Mock de los hooks
+// Configurar mocks
 vi.mock('@/hooks/dropdown/useDropdown');
 vi.mock('@/stores/listModel/listModel');
+vi.mock('@/hooks/auth/useSupabaseAuth');
 
 describe('Dropdown', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    // Mock del hook useDropdown
+    // Mock useDropdown con los modelos de prueba
     vi.mocked(useDropdown).mockReturnValue({
-      listModels: mockModels,
-      fetchModels: vi.fn(),
+      organizedModels: mockModels
     });
 
-    // Mock del hook useListModelStore
+    // Mock useListModelStore con valores iniciales
     vi.mocked(useListModelStore).mockReturnValue({
       selectedModel: 'Modelos LLM',
+      isLoading: false,
       setSelectedModel: vi.fn(),
-      listModels: [],
-      setListModels: vi.fn(),
+    });
+
+    // Mock useSupabaseAuth con usuario de prueba
+    vi.mocked(useSupabaseAuth).mockReturnValue({
+      user: mockUser as User,
+      session: null,
+      loading: false,
+      signIn: vi.fn(),
+      signOut: vi.fn(),
     });
   });
 
-  test('renderiza el dropdown correctamente', async () => {
+  test('renderiza el dropdown correctamente', () => {
     render(<Dropdown />);
-    await waitFor(() => {
-      const button = screen.getByText('Seleccionar modelo LLM');
-      expect(button).toBeInTheDocument();
-    });
+    expect(screen.getByText('Seleccionar modelo LLM')).toBeInTheDocument();
   });
 
-  test('muestra el spinner de carga mientras carga los modelos', async () => {
-    vi.mocked(useDropdown).mockReturnValue({
-      listModels: [],
-      fetchModels: vi
-        .fn()
-        .mockImplementation(
-          () => new Promise((resolve) => setTimeout(resolve, 100)),
-        ),
+  test('muestra el spinner de carga mientras carga los modelos', () => {
+    vi.mocked(useListModelStore).mockReturnValue({
+      selectedModel: '',
+      isLoading: true,
+      setSelectedModel: vi.fn(),
     });
 
     render(<Dropdown />);
-
-    // Abrir el dropdown para ver el spinner
     fireEvent.click(screen.getByText('Seleccionar modelo LLM'));
-
-    await waitFor(() => {
-      expect(screen.getByText('Cargando modelos...')).toBeInTheDocument();
-    });
+    expect(screen.getByText('Cargando modelos...')).toBeInTheDocument();
   });
 
-  test('muestra mensaje cuando no hay modelos disponibles', async () => {
+  test('muestra mensaje cuando no hay modelos disponibles', () => {
     vi.mocked(useDropdown).mockReturnValue({
-      listModels: [],
-      fetchModels: vi.fn().mockResolvedValue([]),
+      organizedModels: []
     });
 
     render(<Dropdown />);
-
-    // Esperar a que se complete la carga
-    await waitFor(() => {
-      fireEvent.click(screen.getByText('Seleccionar modelo LLM'));
-      expect(
-        screen.getByText('No se encontraron modelos disponibles'),
-      ).toBeInTheDocument();
-    });
+    fireEvent.click(screen.getByText('Seleccionar modelo LLM'));
+    expect(screen.getByText('No se encontraron modelos disponibles')).toBeInTheDocument();
   });
 
-  test('muestra la lista de modelos cuando está abierto', async () => {
+  test('muestra la lista de modelos cuando está abierto', () => {
     render(<Dropdown />);
+    
+    fireEvent.click(screen.getByText('Seleccionar modelo LLM'));
+    
+    const companyLabel = screen.getByText(mockModels[0].label);
+    const modelOption = screen.getByText(mockModels[0].options[0].id);
 
-    await waitFor(() => {
-      fireEvent.click(screen.getByText('Seleccionar modelo LLM'));
-
-      // Verificar que se muestran las compañías y los modelos
-      const companyLabel = screen.getByText(mockModels[0].label);
-      const modelOption = screen.getByText(mockModels[0].options[0].id);
-
-      expect(companyLabel).toBeInTheDocument();
-      expect(modelOption).toBeInTheDocument();
-    });
+    expect(companyLabel).toBeInTheDocument();
+    expect(modelOption).toBeInTheDocument();
   });
 
-  test('selecciona un modelo correctamente', async () => {
+  test('selecciona un modelo correctamente', () => {
     const setSelectedModel = vi.fn();
     vi.mocked(useListModelStore).mockReturnValue({
-      selectedModel: 'Modelos LLM',
+      selectedModel: '',
+      isLoading: false,
       setSelectedModel,
-      listModels: [],
-      setListModels: vi.fn(),
     });
 
     render(<Dropdown />);
+    
+    fireEvent.click(screen.getByText('Seleccionar modelo LLM'));
+    fireEvent.click(screen.getByText(mockModels[0].options[0].id));
 
-    await waitFor(() => {
-      fireEvent.click(screen.getByText('Seleccionar modelo LLM'));
-      fireEvent.click(screen.getByText(mockModels[0].options[0].id));
-
-      expect(setSelectedModel).toHaveBeenCalledWith(
-        mockModels[0].options[0].id,
-      );
-    });
+    expect(setSelectedModel).toHaveBeenCalledWith(mockModels[0].options[0].id);
   });
 
-  test('formatea correctamente el tamaño del contexto', async () => {
-    const modelWithLargeContext = {
-      ...mockModels[0],
-      options: [
-        {
-          ...mockModels[0].options[0],
-          context_window: 1500000,
-        },
-      ],
+  test('formatea correctamente el tamaño del contexto', () => {
+    const modelWithContext = {
+      label: 'Test Company',
+      options: [{
+        id: 'test-model',
+        ownedBy: 'test',
+        contextWindow: 1500000
+      }]
     };
 
     vi.mocked(useDropdown).mockReturnValue({
-      listModels: [modelWithLargeContext],
-      fetchModels: vi.fn(),
+      organizedModels: [modelWithContext]
     });
 
     render(<Dropdown />);
-
-    await waitFor(() => {
-      fireEvent.click(screen.getByText('Seleccionar modelo LLM'));
-      const contextSize = screen.getByTitle('Tamaño de contexto');
-      expect(contextSize.textContent).toBe('1.5M');
-    });
+    
+    fireEvent.click(screen.getByText('Seleccionar modelo LLM'));
+    const contextSize = screen.getByTitle('Tamaño de contexto');
+    expect(contextSize.textContent).toBe('1.5M');
   });
 
   test('cierra el dropdown al seleccionar un modelo', async () => {
     render(<Dropdown />);
+    
+    fireEvent.click(screen.getByText('Seleccionar modelo LLM'));
+    
+    const modelOption = screen.getByText(mockModels[0].options[0].id);
+    fireEvent.click(modelOption);
 
-    await waitFor(async () => {
-      // Abrir el dropdown
-      fireEvent.click(screen.getByText('Seleccionar modelo LLM'));
-      const companyLabel = screen.getByText(mockModels[0].label);
-      expect(companyLabel).toBeInTheDocument();
-
-      // Seleccionar un modelo
-      fireEvent.click(screen.getByText(mockModels[0].options[0].id));
-
-      // Verificar que el dropdown se cerró
-      await waitFor(() => {
-        expect(screen.queryByText(mockModels[0].label)).not.toBeInTheDocument();
-      });
+    await waitFor(() => {
+      expect(screen.queryByText(mockModels[0].label)).not.toBeInTheDocument();
     });
   });
 });

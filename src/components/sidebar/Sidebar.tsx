@@ -1,43 +1,36 @@
+import { useChatStore } from '@/stores/chat/chat';
+import { useEffect } from 'react';
 import { Button } from '../ui/button/Button';
 import { Plus } from '../icons/Plus';
 import { Trash } from '../icons/Trash';
-import { useChatStore } from '../../stores/chat/chat';
-import { useEffect, useState } from 'react';
-import { getFirstFiveWords } from '../chat/utils/textUtils';
+import { useSupabaseAuth } from '@/hooks/auth/useSupabaseAuth';
 
 export function Sidebar() {
+  const { user } = useSupabaseAuth();
   const {
     chats,
-    currentChatId,
-    addChat,
-    setCurrentChat,
+    currentChat,
     loadChats,
+    createChat,
     deleteChat,
+    setCurrentChat
   } = useChatStore();
-  const [chatTitles, setChatTitles] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
-    loadChats();
-  }, [loadChats]);
+    if (user?.id) {
+      loadChats(user.id);
+    }
+  }, [user?.id, loadChats]);
 
-  // Efecto para actualizar los títulos cuando cambian los chats
-  useEffect(() => {
-    const newTitles: { [key: string]: string } = {};
-    chats.forEach((chat) => {
-      const firstUserMessage = chat.messages.find((m) => m.role === 'user');
-      newTitles[chat.id] = firstUserMessage
-        ? getFirstFiveWords(firstUserMessage.content)
-        : 'Chat sin título';
-    });
-    setChatTitles(newTitles);
-  }, [chats]);
+  const handleCreateChat = async () => {
+    if (!user?.id) return;
+    await createChat('Nuevo Chat', user.id);
+  };
 
-  const handleDeleteChat = (e: React.MouseEvent, chatId: string) => {
+  const handleDeleteChat = async (e: React.MouseEvent, chatId: number) => {
     e.stopPropagation();
-    if (
-      window.confirm('¿Estás seguro de que quieres eliminar esta conversación?')
-    ) {
-      deleteChat(chatId);
+    if (window.confirm('¿Estás seguro de que quieres eliminar esta conversación?')) {
+      await deleteChat(chatId);
     }
   };
 
@@ -46,7 +39,7 @@ export function Sidebar() {
       <Button
         variant="primary"
         className="w-full mb-4 flex items-center justify-center gap-2"
-        onClick={addChat}
+        onClick={handleCreateChat}
       >
         <Plus />
         <span>Nuevo Chat</span>
@@ -55,19 +48,17 @@ export function Sidebar() {
       <div className="flex-1 overflow-y-auto space-y-2">
         {chats.map((chat) => (
           <div key={chat.id} className="group relative">
-            {chatTitles[chat.id] && (
-              <Button
-                variant="secondary"
-                className={`w-full text-left truncate px-4 py-3 ${
-                  currentChatId === chat.id
-                    ? 'bg-[var(--color-accent)]'
-                    : 'bg-transparent hover:bg-[var(--color-accent)]'
-                } text-[var(--color-text-primary)] transition-colors duration-200`}
-                onClick={() => setCurrentChat(chat.id)}
-              >
-                {chatTitles[chat.id]}
-              </Button>
-            )}
+            <Button
+              variant="secondary"
+              className={`w-full text-left truncate px-4 py-3 ${
+                currentChat?.id === chat.id
+                  ? 'bg-[var(--color-accent)]'
+                  : 'bg-transparent hover:bg-[var(--color-accent)]'
+              } text-[var(--color-text-primary)] transition-colors duration-200`}
+              onClick={() => setCurrentChat(chat)}
+            >
+              {chat.title}
+            </Button>
             <button
               className="absolute right-2 top-1/2 -translate-y-1/2 p-2 opacity-0 group-hover:opacity-100 hover:text-red-500 transition-opacity duration-200"
               onClick={(e) => handleDeleteChat(e, chat.id)}

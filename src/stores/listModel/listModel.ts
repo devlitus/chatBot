@@ -1,40 +1,34 @@
-import { ModelOption } from "@/types/modelOptions";
+import { fetchModels } from "@/services/get/getListModels";
+import { ModelResponse } from "@/types/modelResponse";
 import { create } from "zustand";
 
 interface ListModelStore {
-  listModels: ModelOption[];
+  listModels: ModelResponse[];
   selectedModel: string;
+  isLoading: boolean;
+  error: string | null;
   setSelectedModel: (model: string) => void;
-  setListModels: (models: ModelOption[]) => void;
+  fetchModels: () => Promise<void>;
 }
 
-export const MODEL_STORAGE_KEY = 'selectedModelId';
-
-export const saveSelectedModelToLocalStorage = (modelId: string) => {
-  localStorage.setItem(MODEL_STORAGE_KEY, JSON.stringify({ idModel: modelId }));
-};
-
-export const getSelectedModelFromLocalStorage = (): string => {
-  const storedModel = localStorage.getItem(MODEL_STORAGE_KEY);
-  if (storedModel) {
-    try {
-      const parsedModel = JSON.parse(storedModel);
-      if (parsedModel && parsedModel.idModel) {
-        return parsedModel.idModel;
-      }
-    } catch (error) {
-      console.error('Error parsing stored model:', error);
-    }
-  }
-  return 'Modelos LLM';
-};
-
 export const useListModelStore = create<ListModelStore>()((set) => ({
-  selectedModel: getSelectedModelFromLocalStorage(),
+  selectedModel: 'Modelos LLM',
   listModels: [],
-  setListModels: (models) => set({ listModels: models }),
+  isLoading: false,
+  error: null,
+  
   setSelectedModel: (model) => {
-    saveSelectedModelToLocalStorage(model);
     set({ selectedModel: model });
   },
+
+  fetchModels: async () => {
+    try {
+      set({ isLoading: true, error: null });
+      const models = await fetchModels();
+      set({ listModels: models, isLoading: false });
+    } catch (error) {
+      console.error('Error fetching models:', error);
+      set({ error: 'Error al cargar los modelos', isLoading: false });
+    }
+  }
 }));

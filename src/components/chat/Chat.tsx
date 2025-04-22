@@ -1,25 +1,30 @@
 import { useChatStore } from '@/stores/chat/chat';
-import { useEffect, useRef, useMemo } from 'react';
+import { useEffect, useRef } from 'react';
 import { MessageList } from './components/messageList/MessageList';
 import { useListModelStore } from '@/stores/listModel/listModel';
+import { useSupabaseAuth } from '@/hooks/auth/useSupabaseAuth';
 
 export function Chat() {
-  const { chats, currentChatId } = useChatStore();
+  const { user } = useSupabaseAuth();
+  const { currentChat, messages, loadChats, loadMessages } = useChatStore();
   const { selectedModel } = useListModelStore();
-
-  const currentChat = useMemo(
-    () => chats.find((chat) => chat.id === currentChatId),
-    [chats, currentChatId],
-  );
-  const messages = useMemo(
-    () => currentChat?.messages || [],
-    [currentChat?.messages],
-  );
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
+
+  useEffect(() => {
+    if (user?.id) {
+      loadChats(user.id);
+    }
+  }, [user?.id, loadChats]);
+
+  useEffect(() => {
+    if (currentChat?.id) {
+      loadMessages(currentChat.id);
+    }
+  }, [currentChat?.id, loadMessages]);
 
   useEffect(() => {
     scrollToBottom();
@@ -31,16 +36,14 @@ export function Chat() {
     <div className="h-full p-4 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden text-[var(--color-text-primary)]">
       <div className="max-w-[1280px] mx-auto">
         {!isModelSelected ? (
-          <div className="flex h-full items-center justify-center min-h-[calc(100vh-200px)]">
-            <div className="text-center p-8 bg-[var(--color-surface-secondary)] rounded-lg shadow-md">
-              <h2 className="text-xl font-semibold mb-2">Bienvenido al Chat</h2>
-              <p className="text-lg">
-                Seleccione un modelo LLM para poder empezar
-              </p>
-            </div>
+          <div className="flex flex-col items-center justify-center h-full">
+            <h2 className="text-2xl font-bold mb-4">Selecciona un modelo para comenzar</h2>
           </div>
         ) : (
-          <MessageList messages={messages} messagesEndRef={messagesEndRef} />
+          <>
+            <MessageList messages={messages} />
+            <div ref={messagesEndRef} />
+          </>
         )}
       </div>
     </div>

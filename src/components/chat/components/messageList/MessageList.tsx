@@ -2,15 +2,13 @@ import { RefObject } from 'react';
 import { Spinner } from '@/components/ui/spinner/Spinner';
 import { useMessageStore } from '@/stores/message/message';
 import { Message } from '../message/Message';
+import type { Database } from '@/types/database.types';
 
-interface MessageType {
-  role: 'user' | 'assistant';
-  content: string;
-}
+type Message = Database['public']['Tables']['messages']['Row'];
 
 interface MessageListProps {
-  messages: MessageType[];
-  messagesEndRef: RefObject<HTMLDivElement | null>;
+  messages: Message[];
+  messagesEndRef?: RefObject<HTMLDivElement>;
 }
 
 export function MessageList({ messages, messagesEndRef }: MessageListProps) {
@@ -18,11 +16,11 @@ export function MessageList({ messages, messagesEndRef }: MessageListProps) {
 
   return (
     <div className="space-y-6" data-testid="message-list">
-      {messages.map((message, index) => (
-        <Message key={index} role={message.role} content={message.content} />
+      {messages.map((message) => (
+        <Message key={message.id} role={message.role} content={message.content} />
       ))}
       {isLoading && <Spinner />}
-      <div ref={messagesEndRef} />
+      {messagesEndRef && <div ref={messagesEndRef} />}
     </div>
   );
 }

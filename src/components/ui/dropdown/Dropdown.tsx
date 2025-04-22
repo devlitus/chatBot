@@ -1,32 +1,21 @@
-import { useEffect, useState } from 'react';
 import { Button } from '../button/Button';
 import './Dropdown.css';
 import { ArrowDown } from '../../icons/ArrowDown';
-import { useDropdown } from '@/hooks/dropdown/useDropdown';
-import { useListModelStore } from '@/stores/listModel/listModel';
 import { ModelResponse } from '@/types/modelResponse';
+import { useState } from 'react';
+import { useListModelStore } from '@/stores/listModel/listModel';
+import { useDropdown } from '@/hooks/dropdown/useDropdown';
 
 export function Dropdown() {
   const [isOpen, setIsOpen] = useState(false);
-  const { listModels, fetchModels } = useDropdown();
-  const { selectedModel, setSelectedModel } = useListModelStore();
-  const [isLoading, setIsLoading] = useState(false);
-
-  useEffect(() => {
-    const loadModels = async () => {
-      setIsLoading(true);
-      await fetchModels();
-      setIsLoading(false);
-    };
-    loadModels();
-  }, [fetchModels]);
-
+  const { selectedModel, isLoading, setSelectedModel } = useListModelStore();
+  const { organizedModels } = useDropdown();
+  
   const handleSelect = (modelId: string) => {
     setSelectedModel(modelId);
     setIsOpen(false);
   };
 
-  // Función para formatear el tamaño del contexto
   const formatContextSize = (size: number) => {
     if (!size) return null;
     if (size >= 1000000) return `${(size / 1000000).toFixed(1)}M`;
@@ -34,9 +23,8 @@ export function Dropdown() {
     return size.toString();
   };
 
-  // Determinar el texto a mostrar en el botón del dropdown
   const getDisplayText = () => {
-    if (selectedModel === 'Modelos LLM') {
+    if (!selectedModel || selectedModel === '') {
       return 'Seleccionar modelo LLM';
     }
     return selectedModel;
@@ -60,12 +48,12 @@ export function Dropdown() {
               <div className="spinner"></div>
               <div className="mt-2">Cargando modelos...</div>
             </div>
-          ) : listModels.length === 0 ? (
+          ) : organizedModels.length === 0 ? (
             <div className="p-4 text-center">
               No se encontraron modelos disponibles
             </div>
           ) : (
-            listModels.map((companyOption) => (
+            organizedModels.map((companyOption) => (
               <div key={companyOption.label} className="company-group">
                 <div className="company-label">{companyOption.label}</div>
                 {companyOption.options.map((model: ModelResponse) => (
@@ -82,15 +70,15 @@ export function Dropdown() {
                       <div className="model-name">{model.id}</div>
                       <div className="flex items-center">
                         <div className="model-company text-xs opacity-70">
-                          {model.owned_by}
+                          {model.ownedBy}
                         </div>
-                        {model.context_window && (
+                        {model.contextWindow && (
                           <div className="ml-auto">
                             <span
                               className="capability-badge"
                               title="Tamaño de contexto"
                             >
-                              {formatContextSize(model.context_window)}
+                              {formatContextSize(model.contextWindow)}
                             </span>
                           </div>
                         )}

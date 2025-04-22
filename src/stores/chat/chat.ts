@@ -1,100 +1,110 @@
 import { create } from "zustand";
-import { v7 } from 'uuid';
+import type { Database } from '../../types/database.types';
+import { chatService } from '../../services/supabase/chatService';
 
-interface Message {
-  role: 'user' | 'assistant';
-  content: string;
-}
-
-interface Chat {
-  id: string;
-  title: string;
-  messages: Message[];
-  isActive: boolean;
-}
+type Chat = Database['public']['Tables']['chats']['Row']
+type Message = Database['public']['Tables']['messages']['Row']
 
 interface ChatStore {
   chats: Chat[];
-  currentChatId: string | null;
-  addChat: () => void;
-  deleteChat: (chatId: string) => void;
-  setCurrentChat: (chatId: string) => void;
-  addMessage: (message: Message) => void;
-  loadChats: () => void;
-  activateChat: (chatId: string) => void;
+  currentChat: Chat | null;
+  messages: Message[];
+  loading: boolean;
+  loadChats: (userId: string) => Promise<void>;
+  createChat: (title: string, userId: string) => Promise<void>;
+  deleteChat: (chatId: number) => Promise<void>;
+  setCurrentChat: (chat: Chat | null) => void;
+  loadMessages: (chatId: number) => Promise<void>;
+  sendMessage: (content: string, role: 'user' | 'assistant') => Promise<void>;
+  deleteMessage: (messageId: number) => Promise<void>;
 }
 
-const saveChatsToLocalStorage = (chats: Chat[]) => {
-  localStorage.setItem('chats', JSON.stringify(chats));
-};
-
-export const useChatStore = create<ChatStore>((set) => ({
+export const useChatStore = create<ChatStore>((set, get) => ({
   chats: [],
-  currentChatId: null,
+  currentChat: null,
+  messages: [],
+  loading: false,
 
-  loadChats: () => {
-    const savedChats = localStorage.getItem('chats');
-    if (savedChats) {
-      const chats = JSON.parse(savedChats);
-      set({ chats, currentChatId: chats[0]?.id || null });
-    } 
+  loadChats: async (userId: string) => {
+    set({ loading: true });
+    try {
+      const data = await chatService.getChats(userId);
+      set({ chats: data });
+    } catch (error) {
+      console.error('Error loading chats:', error);
+    } finally {
+      set({ loading: false });
+    }
   },
 
-  addChat: () => {
-    const newChat: Chat = {
-      id: v7(),
-      title: `Chat ${new Date().toLocaleString()}`,
-      messages: [],
-      isActive: false
-    };
-
-    set((state) => {
-      const newChats = [...state.chats, newChat];
-      saveChatsToLocalStorage(newChats);
-      return { chats: newChats, currentChatId: newChat.id };
-    });
+  createChat: async (title: string, userId: string) => {
+    try {
+      const newChat = await chatService.createChat({
+        title,
+        user_id: userId
+      });
+      set(state => ({ 
+        chats: [newChat, ...state.chats],
+        currentChat: newChat
+      }));
+    } catch (error) {
+      console.error('Error creating chat:', error);
+    }
   },
 
-  deleteChat: (chatId: string) => {
-    set((state) => {
-      const newChats = state.chats.filter((chat) => chat.id !== chatId);
-      saveChatsToLocalStorage(newChats);
-      return {
-        chats: newChats,
-        currentChatId: newChats.length > 0 ? newChats[0].id : null,
-      };
-    });
+  deleteChat: async (chatId: number) => {
+    try {
+      await chatService.deleteChat(chatId);
+      set(state => ({
+        chats: state.chats.filter(chat => chat.id !== chatId),
+        currentChat: state.currentChat?.id === chatId ? null : state.currentChat,
+        messages: state.currentChat?.id === chatId ? [] : state.messages
+      }));
+    } catch (error) {
+      console.error('Error deleting chat:', error);
+    }
   },
 
-  setCurrentChat: (chatId: string) => {
-    set({ currentChatId: chatId });
+  setCurrentChat: (chat: Chat | null) => {
+    set({ currentChat: chat });
   },
 
-  activateChat: (chatId: string) => {
-    set((state) => {
-      const newChats = state.chats.map(chat => 
-        chat.id === chatId ? { ...chat, isActive: true } : chat
-      );
-      saveChatsToLocalStorage(newChats);
-      return { chats: newChats };
-    });
+  loadMessages: async (chatId: number) => {
+    set({ loading: true });
+    try {
+      const data = await chatService.getChatMessages(chatId);
+      set({ messages: data });
+    } catch (error) {
+      console.error('Error loading messages:', error);
+    } finally {
+      set({ loading: false });
+    }
   },
 
-  addMessage: (message: Message) => {
-    set((state) => {
-      if (!state.currentChatId) return state;
-
-      const newChats = state.chats.map((chat) =>
-        chat.id === state.currentChatId
-          ? {
-              ...chat,
-              messages: [...chat.messages, message],
-            }
-          : chat
-      );
-
-      saveChatsToLocalStorage(newChats);
-      return { chats: newChats };
-    });
+  sendMessage: async (content: string, role: 'user' | 'assistant') => {
+    const { currentChat } = get();
+    if (!currentChat) return;
+    
+    try {
+      const newMessage = await chatService.createMessage({
+        content,
+        role,
+        chat_id: currentChat.id
+      });
+      set(state => ({ messages: [...state.messages, newMessage] }));
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
   },
+
+  deleteMessage: async (messageId: number) => {
+    try {
+      await chatService.deleteMessage(messageId);
+      set(state => ({
+        messages: state.messages.filter(message => message.id !== messageId)
+      }));
+    } catch (error) {
+      console.error('Error deleting message:', error);
+    }
+  }
 }));
