@@ -1,62 +1,58 @@
-import { describe, test, expect, vi, beforeEach } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
+import { describe, it, expect, beforeEach } from 'vitest';
+import { renderHook } from '@testing-library/react';
 import { useDropdown } from './useDropdown';
-import * as getListModelsModule from '@/services/get/getListModels';
 import { useListModelStore } from '@/stores/listModel/listModel';
-import { mockModels } from '@/mocks/modelMocks';
-
-vi.mock('@/services/get/getListModels');
+import { mockModelsList } from '@/mocks/modelResponseMock';
 
 describe('useDropdown', () => {
-  
-
   beforeEach(() => {
-    vi.clearAllMocks();
-    useListModelStore.setState({ listModels: [], selectedModel: 'Modelos LLM' });
+    useListModelStore.setState({
+      listModels: mockModelsList,
+      selectedModel: '',
+      isLoading: false,
+      error: null
+    });
   });
 
-  test('debería inicializar con una lista de modelos vacía', () => {
+  it('debería organizar los modelos por compañía correctamente', () => {
     const { result } = renderHook(() => useDropdown());
-    expect(result.current.listModels).toEqual([]);
+
+    expect(result.current.organizedModels).toHaveLength(3); // groq, openai, sdaia
+    
+    // Verificar estructura del resultado
+    expect(result.current.organizedModels[0]).toHaveProperty('label');
+    expect(result.current.organizedModels[0]).toHaveProperty('options');
+    
+    // Verificar que los modelos están agrupados correctamente
+    const groqGroup = result.current.organizedModels.find(
+      group => group.label === 'GROQ'
+    );
+    const openaiGroup = result.current.organizedModels.find(
+      group => group.label === 'OpenAI'
+    );
+
+    expect(groqGroup?.options).toHaveLength(1);
+    expect(openaiGroup?.options).toHaveLength(1);
+    
+    // Verificar que los modelos mantienen sus propiedades
+    expect(groqGroup?.options[0]).toEqual(
+      expect.objectContaining({
+        id: 'model-1',
+        ownedBy: 'groq'
+      })
+    );
   });
 
-  test('debería actualizar la lista de modelos al llamar fetchModels', async () => {
-    vi.spyOn(getListModelsModule, 'getListModels').mockResolvedValue(mockModels);
-
-    const { result } = renderHook(() => useDropdown());
-
-    await act(async () => {
-      await result.current.fetchModels();
+  it('debería manejar una lista vacía de modelos', () => {
+    useListModelStore.setState({
+      listModels: [],
+      selectedModel: '',
+      isLoading: false,
+      error: null
     });
 
-    expect(result.current.listModels).toEqual(mockModels);
-  });
-
-  test('debería manejar errores al llamar fetchModels', async () => {
-    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    vi.spyOn(getListModelsModule, 'getListModels').mockRejectedValue(new Error('Error de prueba'));
-
     const { result } = renderHook(() => useDropdown());
 
-    await act(async () => {
-      await result.current.fetchModels();
-    });
-
-    expect(consoleErrorSpy).toHaveBeenCalled();
-    expect(result.current.listModels).toEqual([]);
-
-    consoleErrorSpy.mockRestore();
-  });
-
-  test('no debería actualizar los modelos si la respuesta está vacía', async () => {
-    vi.spyOn(getListModelsModule, 'getListModels').mockResolvedValue([]);
-
-    const { result } = renderHook(() => useDropdown());
-
-    await act(async () => {
-      await result.current.fetchModels();
-    });
-
-    expect(result.current.listModels).toEqual([]);
+    expect(result.current.organizedModels).toHaveLength(0);
   });
 });
