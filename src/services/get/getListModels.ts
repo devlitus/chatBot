@@ -1,27 +1,22 @@
-import { ModelOption } from "@/types/modelOptions";
 import { GROQ_API_KEY, GROQ_URL_MODELS } from "../../constants";
-import { ModelResponse } from "../../types/modelResponse";
-import { transformToModelOptions } from "../models/modelTransformers";
+import { GroqModelResponse, ModelResponse } from "../../types/modelResponse";
 import { ApiResponse } from "@/types/apiResponse";
 import { captureError } from "@/utils/sentry/sentryUtils";
 
-/**
- * Obtiene la lista de modelos desde la API y los agrupa por compañía
- */
-export const getListModels = async (): Promise<ModelOption[]> => {
-  try {
-    const models = await fetchModels();
-    return transformToModelOptions(models);
-  } catch (error: unknown) {
-    handleError(error);
-    return [];
-  }
+
+const mapToModelResponse = (data: GroqModelResponse): ModelResponse => {
+  return {
+    id: data.id,
+    object: data.object,
+    created: data.created,
+    ownedBy: data.owned_by,
+    active: data.active ?? false,
+    contextWindow: data.context_window ?? 0,
+    publicApps: data.public_apps
+  };
 };
 
-/**
- * Obtiene los modelos desde la API
- */
-const fetchModels = async (): Promise<ModelResponse[]> => {
+export const fetchModels = async (): Promise<ModelResponse[]> => {
   try {
     const response = await fetch(GROQ_URL_MODELS, {
       headers: {
@@ -34,8 +29,8 @@ const fetchModels = async (): Promise<ModelResponse[]> => {
       throw new Error(`Error en la API: ${response.status}`);
     }
 
-    const apiResponse = (await response.json()) as ApiResponse<ModelResponse[]>;
-    return apiResponse.data;
+    const apiResponse = (await response.json()) as ApiResponse<GroqModelResponse[]>;
+    return apiResponse.data.map(mapToModelResponse);
   } catch (error) {
     handleError(error);
     throw new Error(`Error al obtener modelos: ${error instanceof Error ? error.message : 'Error desconocido'}`);
