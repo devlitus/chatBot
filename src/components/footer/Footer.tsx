@@ -12,17 +12,17 @@ export function Footer() {
   const [messageText, setMessageText] = useState('');
   const { user } = useSupabaseAuth();
   const { createChat, currentChat, sendMessage } = useChatStore();
-  const { isLoading } = useMessage();
-  const { selectedModel, loadUserPreference } = useListModelStore();
+  const { isLoading: isSending } = useMessage();
+  const { selectedModel, fetchModels,  } = useListModelStore();
 
   useEffect(() => {
     if (user?.id) {
-      loadUserPreference();
+      fetchModels();
     }
-  }, [user?.id, loadUserPreference]);
+  }, [user?.id, fetchModels]);
 
   const isInputDisabled = selectedModel === 'Modelos LLM' || !user;
-  const isSendDisabled = isInputDisabled || !messageText.trim() || isLoading;
+  const isSendDisabled = isInputDisabled || !messageText.trim() || isSending;
 
   const handleSendMessage = useCallback(async () => {
     const trimmedMessage = messageText.trim();
@@ -75,7 +75,7 @@ export function Footer() {
           disabled={isSendDisabled}
           aria-label="enviar mensaje"
         >
-          {isLoading ? (
+          {isSending ? (
             <div className="animate-spin h-5 w-5 border-2 border-[var(--color-accent)] border-t-transparent rounded-full"></div>
           ) : isSendDisabled ? (
             <NoSend />
