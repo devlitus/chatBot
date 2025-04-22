@@ -2,6 +2,7 @@ import { renderHook, act } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { useSupabaseChat } from './useSupabaseChat'
 import { chatService } from '../../services/supabase/chatService'
+import { mockUser } from '@/mocks/userMocks'
 
 interface SupabaseChat {
   id: number;
@@ -31,13 +32,13 @@ vi.mock('../../services/supabase/chatService', () => ({
 }))
 
 describe('useSupabaseChat', () => {
-  const mockUserId = 'test-user-123'
   const mockChat: SupabaseChat = {
     id: 1,
     title: 'Test Chat',
-    user_id: mockUserId,
+    user_id: mockUser.id,
     created_at: new Date().toISOString()
   }
+
   const mockMessage: SupabaseMessage = {
     id: 1,
     content: 'Test message',
@@ -54,7 +55,7 @@ describe('useSupabaseChat', () => {
     const mockChats = [mockChat]
     vi.mocked(chatService.getChats).mockResolvedValue(mockChats)
 
-    const { result } = renderHook(() => useSupabaseChat(mockUserId))
+    const { result } = renderHook(() => useSupabaseChat(mockUser.id))
 
     expect(result.current.chats).toEqual([])
     expect(result.current.loading).toBe(false)
@@ -63,7 +64,7 @@ describe('useSupabaseChat', () => {
       await result.current.loadChats()
     })
 
-    expect(chatService.getChats).toHaveBeenCalledWith(mockUserId)
+    expect(chatService.getChats).toHaveBeenCalledWith(mockUser.id)
     expect(result.current.chats).toEqual(mockChats)
     expect(result.current.loading).toBe(false)
   })
@@ -71,7 +72,7 @@ describe('useSupabaseChat', () => {
   it('debería crear un nuevo chat', async () => {
     vi.mocked(chatService.createChat).mockResolvedValue(mockChat)
 
-    const { result } = renderHook(() => useSupabaseChat(mockUserId))
+    const { result } = renderHook(() => useSupabaseChat(mockUser.id))
 
     await act(async () => {
       await result.current.createChat('Test Chat')
@@ -79,7 +80,7 @@ describe('useSupabaseChat', () => {
 
     expect(chatService.createChat).toHaveBeenCalledWith({
       title: 'Test Chat',
-      user_id: mockUserId,
+      user_id: mockUser.id,
     })
     expect(result.current.chats).toEqual([mockChat])
     expect(result.current.currentChat).toEqual(mockChat)
@@ -87,7 +88,7 @@ describe('useSupabaseChat', () => {
 
   it('debería eliminar un chat existente', async () => {
     vi.mocked(chatService.deleteChat).mockResolvedValue(undefined)
-    const { result } = renderHook(() => useSupabaseChat(mockUserId))
+    const { result } = renderHook(() => useSupabaseChat(mockUser.id))
 
     // Establecer un chat actual y algunos mensajes
     result.current.setCurrentChat(mockChat)
@@ -105,7 +106,7 @@ describe('useSupabaseChat', () => {
     const mockMessages = [mockMessage]
     vi.mocked(chatService.getChatMessages).mockResolvedValue(mockMessages)
 
-    const { result } = renderHook(() => useSupabaseChat(mockUserId))
+    const { result } = renderHook(() => useSupabaseChat(mockUser.id))
 
     await act(async () => {
       await result.current.loadMessages(1)
@@ -118,7 +119,7 @@ describe('useSupabaseChat', () => {
   it('debería enviar un nuevo mensaje', async () => {
     vi.mocked(chatService.createMessage).mockResolvedValue(mockMessage)
     
-    const { result } = renderHook(() => useSupabaseChat(mockUserId))
+    const { result } = renderHook(() => useSupabaseChat(mockUser.id))
     
     // Establecer un chat actual
     result.current.setCurrentChat(mockChat)
@@ -138,7 +139,7 @@ describe('useSupabaseChat', () => {
   it('debería eliminar un mensaje existente', async () => {
     vi.mocked(chatService.deleteMessage).mockResolvedValue(undefined)
     
-    const { result } = renderHook(() => useSupabaseChat(mockUserId))
+    const { result } = renderHook(() => useSupabaseChat(mockUser.id))
     
     // Establecer un chat actual con un mensaje inicial
     result.current.setCurrentChat({
