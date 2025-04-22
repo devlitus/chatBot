@@ -4,6 +4,11 @@ import { ModelOption } from '@/types/modelOptions';
 export const modelService = {
   async storeModels(models: ModelOption[]): Promise<void> {
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error('No hay sesión activa');
+      }
+
       // Primero eliminamos los modelos existentes
       await supabase
         .from('models')
@@ -17,7 +22,8 @@ export const modelService = {
           models.flatMap(company => 
             company.options.map(model => ({
               id: model.id,
-              model_data: model
+              model_data: model,
+              user_id: session.user.id  // Añadimos el user_id para RLS
             }))
           )
         );
@@ -31,9 +37,15 @@ export const modelService = {
 
   async getModels(): Promise<ModelOption[]> {
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error('No hay sesión activa');
+      }
+
       const { data, error } = await supabase
         .from('models')
-        .select('*');
+        .select('*')
+        .eq('user_id', session.user.id);  // Filtramos por user_id para RLS
 
       if (error) throw error;
 

@@ -13,7 +13,7 @@ interface CompanyModels {
  */
 export const filterModelsByCompany = (models: ModelResponse[]): ModelResponse[] => {
   return models.filter(model => {
-    const company = model.owned_by.toLowerCase();
+    const company = model.ownedBy.toLowerCase();
     return !EXCLUDED_COMPANIES.some(excluded => company.includes(excluded));
   });
 };
@@ -23,7 +23,7 @@ export const filterModelsByCompany = (models: ModelResponse[]): ModelResponse[] 
  */
 export const groupModelsByCompany = (models: ModelResponse[]): CompanyModels => {
   return models.reduce<CompanyModels>((acc, model) => {
-    const company = model.owned_by.toLowerCase();
+    const company = model.ownedBy.toLowerCase();
     if (!acc[company]) {
       acc[company] = [];
     }
