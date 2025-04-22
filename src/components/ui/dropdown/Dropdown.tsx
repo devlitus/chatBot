@@ -8,11 +8,11 @@ import { useDropdown } from '@/hooks/dropdown/useDropdown';
 
 export function Dropdown() {
   const [isOpen, setIsOpen] = useState(false);
-  const { selectedModel, isLoading, setSelectedModel } = useListModelStore();
-  const { organizedModels } = useDropdown();
+  const { selectedModel, isLoading } = useListModelStore();
+  const { organizedModels, handleModelSelect } = useDropdown();
   
-  const handleSelect = (modelId: string) => {
-    setSelectedModel(modelId);
+  const handleSelect = async (modelId: string) => {
+    await handleModelSelect(modelId);
     setIsOpen(false);
   };
 
