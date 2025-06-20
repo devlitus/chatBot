@@ -6,3 +6,89 @@
     </button>
   </div>
 </footer>
+<script>
+  import { addMessageToDB, getMessagesFromDB } from '../utils/db';
+	import { marked } from 'marked';
+
+  const messagesContainer = document.getElementById('messages-container');
+  const messageInput = document.getElementById('message-input') as HTMLInputElement;
+  const sendButton = document.getElementById('send-button');
+
+  function renderMessage(message: string, sender: 'user' | 'bot') {
+    if (!messagesContainer) return;
+
+    const messageElement = document.createElement('div');
+    messageElement.className = 'flex items-start gap-2.5';
+
+    let messageContent: string;
+
+    if (sender === 'user') {
+      messageElement.classList.add('justify-end');
+      messageContent = `
+        <div class="flex flex-col w-fit leading-1.5 p-5 bg-gray-800 rounded-s-xl rounded-ee-xl">
+          <p class="text-lg text-balance font-normal text-white"></p>
+        </div>
+      `;
+      messageElement.innerHTML = messageContent;
+      const p = messageElement.querySelector('p');
+      if (p) {
+        p.textContent = message;
+      }
+    } else {
+      messageContent = `
+        <div class="flex flex-col w-fit leading-1.5 p-5">
+           <p class="text-lg text-balance font-normal text-gray-300"></p>
+        </div>
+      `;
+      messageElement.innerHTML = messageContent;
+      const parsedContent = marked.parse(message);
+      if(typeof parsedContent === 'string') {
+        const p = messageElement.querySelector('p');
+        if (p) {
+          p.innerHTML = parsedContent;
+        }
+      }
+    }
+
+    messagesContainer.appendChild(messageElement);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  }
+  
+  async function addMessage(text: string, sender: 'user' | 'bot') {
+    renderMessage(text, sender);
+    await addMessageToDB({ text, sender });
+  }
+
+  async function handleSendMessage() {
+    const message = messageInput.value.trim();
+    if (message) {
+      await addMessage(message, 'user');
+      messageInput.value = '';
+
+			const response = await fetch('/api/chat', {
+				method: 'POST',
+				body: JSON.stringify({ message }),
+			})
+			const data = await response.text()
+			await addMessage(data, 'bot');
+    }
+  }
+
+  async function loadMessages() {
+    const messages = await getMessagesFromDB();
+    if (messages.length === 0) {
+      await addMessage('¡Hola! ¿Cómo puedo ayudarte hoy?', 'bot');
+    } else {
+      messages.forEach(msg => renderMessage(msg.text, msg.sender));
+    }
+  }
+
+  sendButton?.addEventListener('click', handleSendMessage);
+  messageInput?.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      handleSendMessage();
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', loadMessages);
+</script>
