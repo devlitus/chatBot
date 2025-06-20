@@ -9,6 +9,11 @@
     "astro": "astro"
   },
   "dependencies": {
-    "astro": "^5.10.0"
+    "@google/genai": "^1.5.1",
+    "@tailwindcss/vite": "^4.1.10",
+    "@types/marked": "^5.0.2",
+    "astro": "^5.10.0",
+    "marked": "^15.0.12",
+    "tailwindcss": "^4.1.10"
   }
 }
