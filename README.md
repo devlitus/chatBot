@@ -1,4 +1,4 @@
-# Astro ChatBot Project
+# ChatBot Project
 
 Este proyecto es una aplicación de chatbot interactiva construida con el framework Astro. Permite a los usuarios mantener conversaciones con un asistente de inteligencia artificial desarrollado con la API Google Generative AI (específicamente, el modelo Gemini). La interfaz de usuario está diseñada con Tailwind CSS para una apariencia moderna y responsiva. El historial de la conversación se almacena localmente en el navegador del usuario utilizando IndexedDB, lo que permite que los mensajes persistan entre sesiones. El backend, implementado como un endpoint de API de Astro, gestiona la comunicación con el servicio de IA de Google.
 
