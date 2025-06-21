@@ -4,6 +4,8 @@ import { marked } from 'marked';
 const messagesContainer = document.getElementById('messages-container') as HTMLDivElement | null;
 const messageInput = document.getElementById('message-input') as HTMLInputElement | null;
 const sendButton = document.getElementById('send-button') as HTMLButtonElement | null;
+const loadingIndicator = document.getElementById('loading-indicator') as HTMLDivElement | null;
+
 
 function createUserMessageElement(message: string): HTMLDivElement {
   const messageElement = document.createElement('div');
@@ -65,6 +67,7 @@ async function handleSendMessage() {
   if (message) {
     await addMessage(message, 'user');
     messageInput.value = '';
+    loadingIndicator?.classList.remove('hidden');
 
     try {
       const response = await fetch('/api/chat', {
@@ -80,6 +83,8 @@ async function handleSendMessage() {
       console.error('Error sending message:', error);
       // Optionally, render an error message to the user in the chat
       await addMessage('Error: Could not connect to the server. Please try again later.', 'bot');
+    } finally {
+      loadingIndicator?.classList.add('hidden');
     }
   }
 }
