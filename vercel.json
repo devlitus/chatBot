@@ -3,10 +3,5 @@
   "outputDirectory": "dist",
   "framework": "astro",
   "installCommand": "npm install",
-  "devCommand": "npm run dev",
-  "functions": {
-    "src/pages/api/**/*.ts": {
-      "runtime": "@vercel/node@18"
-    }
-  }
+  "devCommand": "npm run dev"
 } 
