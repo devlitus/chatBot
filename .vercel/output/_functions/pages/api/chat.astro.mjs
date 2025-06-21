@@ -1,7 +1,7 @@
 import { GoogleGenAI } from '@google/genai';
 export { renderers } from '../../renderers.mjs';
 
-const GEMINI_API_KEY = "AIzaSyCqjFQlOp6RJrrZYZCHUo983cevWp0FAwU";
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "dummy-key";
 
 const prerender = false;
 const POST = async ({ request }) => {
