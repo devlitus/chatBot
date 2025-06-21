@@ -1,4 +1,4 @@
-import { addMessageToDB, getMessagesFromDB } from '../utils/db';
+import { addMessageToDB, getMessagesFromDB } from './db';
 import { marked } from 'marked';
 
 const messagesContainer = document.getElementById('messages-container') as HTMLDivElement | null;
@@ -108,10 +108,10 @@ function initializeChat(): void {
   loadMessages();
 }
 
-// Initialize chat when the DOM is fully loaded
 if (document.readyState === 'loading') {
+  console.log('ready')
   document.addEventListener('DOMContentLoaded', initializeChat);
 } else {
-  // DOMContentLoaded has already fired
+
   initializeChat();
 }
