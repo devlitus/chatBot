@@ -15,7 +15,9 @@
     "test:e2e": "playwright test",
     "test:ci": "vitest run --reporter=verbose",
     "lint": "eslint . --ext .js,.ts,.astro",
-    "lint:fix": "eslint . --ext .js,.ts,.astro --fix"
+    "lint:fix": "eslint . --ext .js,.ts,.astro --fix",
+    "restore": "npm i --no-optional --no-package-lock",
+"restore:prod": "npm run restore -- --only=production"
   },
   "dependencies": {
     "@astrojs/vercel": "^8.0.4",
