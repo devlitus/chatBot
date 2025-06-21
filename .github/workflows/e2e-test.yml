@@ -40,7 +40,7 @@ jobs:
             ${{ runner.os }}-playwright-
       
       - name: Install dependencies
-        run: npm ci --omit=optional
+        run: npm i --omit=optional
       
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
