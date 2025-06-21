@@ -2,6 +2,39 @@
 
 Este proyecto es una aplicación de chatbot interactiva construida con el framework Astro. Permite a los usuarios mantener conversaciones con un asistente de inteligencia artificial desarrollado con la API Google Generative AI (específicamente, el modelo Gemini). La interfaz de usuario está diseñada con Tailwind CSS para una apariencia moderna y responsiva. El historial de la conversación se almacena localmente en el navegador del usuario utilizando IndexedDB, lo que permite que los mensajes persistan entre sesiones. El backend, implementado como un endpoint de API de Astro, gestiona la comunicación con el servicio de IA de Google.
 
+## 🚀 CI/CD Pipeline
+
+Este proyecto incluye un pipeline completo de CI/CD con GitHub Actions optimizado para Pull Requests:
+
+[![CI/CD](https://github.com/{username}/{repo-name}/workflows/CI/CD%20Pipeline/badge.svg)](https://github.com/{username}/{repo-name}/actions/workflows/ci-cd.yml)
+[![Security](https://github.com/{username}/{repo-name}/workflows/Security%20Scan/badge.svg)](https://github.com/{username}/{repo-name}/actions/workflows/security.yml)
+[![Deploy](https://github.com/{username}/{repo-name}/workflows/Deploy%20to%20Production/badge.svg)](https://github.com/{username}/{repo-name}/actions/workflows/deploy-production.yml)
+
+### Workflows Automatizados
+
+- **CI/CD Pipeline**: Tests, build y preview automático en Pull Requests
+- **Security Scan**: Auditoría semanal de dependencias y análisis en PRs
+- **Performance Tests**: Análisis de rendimiento en cada PR
+- **Production Deploy**: Deploy automático solo después de merge a main
+
+### Flujo de Trabajo
+
+1. **Desarrollo**: Crea una rama y haz tus cambios
+2. **Pull Request**: Crea un PR → Se ejecutan automáticamente:
+   - ✅ Tests y build
+   - ✅ Análisis de seguridad
+   - ✅ Tests de rendimiento
+   - ✅ Deploy de preview
+3. **Revisión**: Revisa los resultados y el preview
+4. **Merge**: Una vez aprobado → Deploy automático a producción
+
+### URLs de Deploy
+
+- **Producción**: `https://{username}.github.io/{repo-name}/`
+- **Preview PR**: `https://{username}.github.io/{repo-name}/preview/{PR_NUMBER}/`
+
+Para más detalles sobre la configuración de CI/CD, consulta [`.github/README.md`](.github/README.md).
+
 ## 🤖 Funcionalidad del Chatbot
 
 El núcleo de este proyecto es su funcionalidad de chatbot, que opera de la siguiente manera:

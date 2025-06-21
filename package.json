@@ -2,6 +2,9 @@
   "name": "chatbot",
   "type": "module",
   "version": "0.0.1",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
@@ -11,8 +14,7 @@
     "test:ui": "vitest --ui"
   },
   "dependencies": {
-    "@astrojs/vercel": "^8.2.0",
-    "@google/genai": "^1.5.1",
+    "@google/genai": "^1.6.0",
     "@tailwindcss/vite": "^4.1.10",
     "@types/marked": "^5.0.2",
     "astro": "^5.10.0",
