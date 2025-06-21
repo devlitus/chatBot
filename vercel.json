@@ -6,7 +6,7 @@
   "devCommand": "npm run dev",
   "functions": {
     "src/pages/api/**/*.ts": {
-      "runtime": "nodejs18.x"
+      "runtime": "@vercel/node@18"
     }
   }
 } 
