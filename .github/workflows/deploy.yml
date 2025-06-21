@@ -1,15 +1,14 @@
-name: Deploy to Vercel
+name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main, develop ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ main, develop ]
 
 jobs:
-  test:
+  setup:
     runs-on: ubuntu-latest
-    
     steps:
     - uses: actions/checkout@v4
     
@@ -23,9 +22,57 @@ jobs:
       run: |
         rm -rf node_modules package-lock.json
         npm install
+
+  lint:
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Run linting
+      run: npm run lint
+
+  unit-tests:
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
     
     - name: Run unit tests
       run: npm test
+
+  e2e-tests:
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
     
     - name: Install Playwright browsers
       run: npx playwright install --with-deps
@@ -35,8 +82,26 @@ jobs:
       env:
         CI: true
 
+  build:
+    runs-on: ubuntu-latest
+    needs: [lint, unit-tests, e2e-tests]
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Build Astro project
+      run: npm run build
+
   deploy:
-    needs: test
+    needs: build
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
     
@@ -49,10 +114,8 @@ jobs:
         node-version: '20'
         cache: 'npm'
     
-    - name: Clean install dependencies
-      run: |
-        rm -rf node_modules package-lock.json
-        npm install
+    - name: Install dependencies
+      run: npm ci
     
     - name: Build project
       run: npm run build
