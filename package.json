@@ -10,14 +10,17 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "test": "vitest",
+    "test": "vitest run",
     "test:ui": "vitest --ui",
     "test:e2e": "playwright test",
+    "test:ci": "vitest run --reporter=verbose",
     "lint": "eslint . --ext .js,.ts,.astro",
-    "lint:fix": "eslint . --ext .js,.ts,.astro --fix"
+    "lint:fix": "eslint . --ext .js,.ts,.astro --fix",
+    "ci:install": "npm ci --ignore-scripts",
+    "ci:test": "npm run test:ci"
   },
   "dependencies": {
-    "@astrojs/vercel": "^8.2.0",
+    "@astrojs/vercel": "^8.0.4",
     "@google/genai": "^1.6.0",
     "@tailwindcss/vite": "^4.1.10",
     "@types/marked": "^5.0.2",
