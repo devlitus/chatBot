@@ -6,7 +6,9 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "test": "vitest",
+    "test:ui": "vitest --ui"
   },
   "dependencies": {
     "@google/genai": "^1.5.1",
@@ -15,5 +17,10 @@
     "astro": "^5.10.0",
     "marked": "^15.0.12",
     "tailwindcss": "^4.1.10"
+  },
+  "devDependencies": {
+    "@vitest/ui": "^3.2.4",
+    "happy-dom": "^18.0.1",
+    "vitest": "^3.2.4"
   }
 }

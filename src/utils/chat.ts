@@ -120,3 +120,13 @@ if (document.readyState === 'loading') {
 
   initializeChat();
 }
+
+if (import.meta.vitest) {
+  const { describe, it, expect } = import.meta.vitest;
+
+  describe('Chat Utility', () => {
+    it('should always pass as a placeholder', () => {
+      expect(true).toBe(true);
+    });
+  });
+}
