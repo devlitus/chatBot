@@ -18,11 +18,8 @@ jobs:
           node-version: '20'
           cache: 'npm'
       - name: Install dependencies
-        run: npm install --ignore-scripts --omit=optional
+        run: npm install
         env:
           NODE_ENV: production
       - name: Run unit tests
-        run: npm run test:ci
-        env:
-          NODE_ENV: test
-          VITEST_CONFIG: vitest.ci.config.ts 
+        run: npm run test
