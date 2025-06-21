@@ -4,7 +4,6 @@ import {
   createUserMessageElement, 
   createBotMessageElement,
   renderMessage,
-  addMessage,
   handleSendMessage,
   loadMessages,
   initializeChat

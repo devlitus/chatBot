@@ -2,7 +2,7 @@
 import type { APIRoute } from 'astro';
 import { getUserByEmail, verifyPassword } from '../../../utils/db'; // Asumimos que estas funciones existen
 
-export const POST: APIRoute = async ({ request, cookies, redirect }) => {
+export const POST: APIRoute = async ({ request, cookies }) => {
   const formData = await request.formData();
   const email = formData.get('email')?.toString();
   const password = formData.get('password')?.toString();
