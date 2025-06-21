@@ -31,7 +31,6 @@ jobs:
       
       - name: Install dependencies
         run: npm run restore
-        run: npm install --omit=optional
         env:
           NODE_ENV: production
       
