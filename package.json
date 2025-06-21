@@ -15,9 +15,7 @@
     "test:e2e": "playwright test",
     "test:ci": "vitest run --reporter=verbose",
     "lint": "eslint . --ext .js,.ts,.astro",
-    "lint:fix": "eslint . --ext .js,.ts,.astro --fix",
-    "ci:install": "npm ci --ignore-scripts",
-    "ci:test": "npm run test:ci"
+    "lint:fix": "eslint . --ext .js,.ts,.astro --fix"
   },
   "dependencies": {
     "@astrojs/vercel": "^8.0.4",
