@@ -2,6 +2,11 @@
 
 Este directorio contiene los workflows de CI/CD para el proyecto ChatBot.
 
+## Requisitos del Sistema
+
+- **Node.js**: >=20.0.0 (requerido por las dependencias)
+- **npm**: >=10.0.0
+
 ## Workflows Disponibles
 
 ### 1. `ci-cd.yml` - Pipeline de CI y Preview
@@ -9,7 +14,7 @@ Este directorio contiene los workflows de CI/CD para el proyecto ChatBot.
 
 **Jobs:**
 - **CI (Continuous Integration):**
-  - Instalación de dependencias
+  - Instalación de dependencias (npm ci con fallback a npm install)
   - Linting (si está configurado)
   - Tests unitarios
   - Build del proyecto
@@ -125,12 +130,23 @@ Los workflows requieren estos permisos:
 - Deploy automático solo después de merge
 - Preview para validación antes de producción
 
+### ✅ Compatibilidad
+- Node.js 20+ para compatibilidad con dependencias modernas
+- Estrategia robusta de instalación de dependencias
+- Fallback automático si hay problemas de sincronización
+
 ## Troubleshooting
 
 ### Build Fails en PR
 1. Revisa los logs en Actions
 2. Verifica que `npm run build` funcione localmente
 3. Asegúrate de que todas las dependencias estén en `package.json`
+4. Verifica que estés usando Node.js >=20.0.0
+
+### Problemas de Instalación de Dependencias
+1. Los workflows usan `npm ci || npm install` como fallback
+2. Si persisten los problemas, ejecuta `npm install` localmente
+3. Commit y push del `package-lock.json` actualizado
 
 ### Deploy Fails
 1. Verifica que GitHub Pages esté habilitado
@@ -158,7 +174,7 @@ Los workflows requieren estos permisos:
 Modifica `NODE_VERSION` en los workflows:
 ```yaml
 env:
-  NODE_VERSION: '20'  # Cambia a la versión deseada
+  NODE_VERSION: '22'  # Cambia a la versión deseada
 ```
 
 ### Agregar Más Tests
