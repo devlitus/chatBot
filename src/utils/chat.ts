@@ -1,13 +1,13 @@
 import { addMessageToDB, getMessagesFromDB } from './db';
 import { marked } from 'marked';
 
-const messagesContainer = document.getElementById('messages-container') as HTMLDivElement | null;
-const messageInput = document.getElementById('message-input') as HTMLInputElement | null;
-const sendButton = document.getElementById('send-button') as HTMLButtonElement | null;
-const loadingIndicator = document.getElementById('loading-indicator') as HTMLDivElement | null;
+let messagesContainer: HTMLDivElement | null;
+let messageInput: HTMLInputElement | null;
+let sendButton: HTMLButtonElement | null;
+let loadingIndicator: HTMLDivElement | null;
 
 
-function createUserMessageElement(message: string): HTMLDivElement {
+export function createUserMessageElement(message: string): HTMLDivElement {
   const messageElement = document.createElement('div');
   messageElement.className = 'flex items-start gap-2.5 justify-end';
   messageElement.innerHTML = `
@@ -22,7 +22,7 @@ function createUserMessageElement(message: string): HTMLDivElement {
   return messageElement;
 }
 
-function createBotMessageElement(message: string): HTMLDivElement {
+export function createBotMessageElement(message: string): HTMLDivElement {
   const messageElement = document.createElement('div');
   messageElement.className = 'flex items-start gap-2.5';
   messageElement.innerHTML = `
@@ -40,7 +40,7 @@ function createBotMessageElement(message: string): HTMLDivElement {
   return messageElement;
 }
 
-function renderMessage(message: string, sender: 'user' | 'bot') {
+export function renderMessage(message: string, sender: 'user' | 'bot') {
   if (!messagesContainer) return;
 
   let messageElement: HTMLDivElement;
@@ -55,12 +55,12 @@ function renderMessage(message: string, sender: 'user' | 'bot') {
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
-async function addMessage(text: string, sender: 'user' | 'bot') {
+export async function addMessage(text: string, sender: 'user' | 'bot') {
   renderMessage(text, sender);
   await addMessageToDB({ text, sender });
 }
 
-async function handleSendMessage() {
+export async function handleSendMessage() {
   if (!messageInput || !messageInput.value) return;
 
   const message = messageInput.value.trim();
@@ -89,7 +89,7 @@ async function handleSendMessage() {
   }
 }
 
-async function loadMessages() {
+export async function loadMessages() {
   const messages = await getMessagesFromDB();
   if (messages.length === 0) {
     await addMessage('¡Hola! ¿Cómo puedo ayudarte hoy?', 'bot');
@@ -98,7 +98,12 @@ async function loadMessages() {
   }
 }
 
-function initializeChat(): void {
+export function initializeChat(): void {
+  messagesContainer = document.getElementById('messages-container') as HTMLDivElement | null;
+  messageInput = document.getElementById('message-input') as HTMLInputElement | null;
+  sendButton = document.getElementById('send-button') as HTMLButtonElement | null;
+  loadingIndicator = document.getElementById('loading-indicator') as HTMLDivElement | null;
+
   if (sendButton) {
     sendButton.addEventListener('click', handleSendMessage);
   }
@@ -121,12 +126,3 @@ if (document.readyState === 'loading') {
   initializeChat();
 }
 
-if (import.meta.vitest) {
-  const { describe, it, expect } = import.meta.vitest;
-
-  describe('Chat Utility', () => {
-    it('should always pass as a placeholder', () => {
-      expect(true).toBe(true);
-    });
-  });
-}
