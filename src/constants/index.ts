@@ -1,0 +1,1 @@
+export const GOOGLE_API_KEY = import.meta.env.GOOGLE_API_KEY;
