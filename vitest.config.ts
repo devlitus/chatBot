@@ -9,4 +9,9 @@ export default defineConfig({
     exclude: ['tests/e2e/**/*', 'tests/setup.ts'],
     setupFiles: ['tests/setup.ts'], // <--- Add this line
   },
+  resolve: {
+    alias: {
+      'astro:env/server': 'tests/mocks/astro-env.js'
+    }
+  }
 });

@@ -1,4 +1,9 @@
 import { describe, it, expect, vi } from 'vitest'
+
+vi.mock('../../src/utils/env', () => ({
+  GEMINI_API_KEY: 'test-api-key'
+}))
+
 import { POST } from '../../src/pages/api/chat'
 
 const mockGenerateContent = vi.fn()

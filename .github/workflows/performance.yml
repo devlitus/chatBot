@@ -1,0 +1,51 @@
+name: Performance Tests
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  performance:
+    name: Performance Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm install
+        
+      - name: Build project
+        run: npm run build
+        
+      - name: Analyze bundle size
+        run: |
+          echo "Analyzing bundle size..."
+          if [ -d "dist" ]; then
+            echo "Build output size:"
+            du -sh dist/
+            echo "File sizes in dist/:"
+            find dist/ -type f -exec ls -lh {} \;
+          else
+            echo "No dist directory found"
+          fi
+          
+      - name: Check for large files
+        run: |
+          echo "Checking for files larger than 1MB..."
+          find dist/ -type f -size +1M -exec ls -lh {} \; || echo "No large files found"
+          
+      - name: Upload build analysis
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: build-analysis
+          path: dist/
+          retention-days: 7 
