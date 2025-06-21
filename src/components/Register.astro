@@ -1,0 +1,112 @@
+---
+// src/components/Register.astro
+import type { APIRoute } from 'astro';
+
+let error = '';
+let success = '';
+
+if (Astro.request.method === 'POST') {
+  const formData = await Astro.request.formData();
+  const email = formData.get('email');
+  const password = formData.get('password');
+  const confirmPassword = formData.get('confirm-password');
+
+  if (password !== confirmPassword) {
+    error = 'Passwords do not match';
+  } else {
+    // Aquí iría la lógica de registro de usuario
+    // Por ahora, simularemos un éxito
+    console.log('Registration attempt:', { email, password });
+    success = 'Registration successful! You can now login.';
+    // En un caso real, aquí se guardaría el usuario en la base de datos
+    // y posiblemente se redirigiría a la página de login o dashboard
+    // return Astro.redirect('/login');
+  }
+}
+---
+<div class="register-container">
+  <h2>Register</h2>
+  {error && <p class="error">{error}</p>}
+  {success && <p class="success">{success}</p>}
+  {!success && (
+    <form method="POST" action="/api/auth/register">
+      <div>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required />
+      </div>
+      <div>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required />
+      </div>
+      <div>
+        <label for="confirm-password">Confirm Password:</label>
+        <input type="password" id="confirm-password" name="confirm-password" required />
+      </div>
+      <button type="submit">Register</button>
+    </form>
+  )}
+  <p>Already have an account? <a href="/login">Login here</a></p>
+</div>
+
+<style>
+  .register-container {
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  h2 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  div {
+    margin-bottom: 15px;
+  }
+  label {
+    display: block;
+    margin-bottom: 5px;
+  }
+  input[type="email"],
+  input[type="password"] {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  button[type="submit"] {
+    width: 100%;
+    padding: 10px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  button[type="submit"]:hover {
+    background-color: #218838;
+  }
+  .error {
+    color: red;
+    text-align: center;
+    margin-bottom: 15px;
+  }
+  .success {
+    color: green;
+    text-align: center;
+    margin-bottom: 15px;
+  }
+  p {
+    text-align: center;
+    margin-top: 20px;
+  }
+  a {
+    color: #007bff;
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+</style>

@@ -71,4 +71,61 @@ export async function getMessagesFromDB(): Promise<ChatMessage[]> {
       reject([]);
     };
   });
-} 
+}
+
+// --- Funciones de autenticación simuladas ---
+// En una aplicación real, esto interactuaría con una base de datos de usuarios segura.
+
+interface User {
+  id: string;
+  email: string;
+  passwordHash: string;
+}
+
+// Simulación de base de datos de usuarios en memoria
+const users: User[] = [];
+
+export async function getUserByEmail(email: string): Promise<User | undefined> {
+  // Simula una búsqueda asíncrona en la base de datos
+  return new Promise(resolve => {
+    setTimeout(() => {
+      const user = users.find(u => u.email === email);
+      resolve(user);
+    }, 100); // Simula latencia de red/DB
+  });
+}
+
+export async function createUser(email: string, passwordHash: string): Promise<User> {
+  // Simula la creación de un usuario en la base de datos
+  return new Promise(resolve => {
+    setTimeout(() => {
+      const newUser: User = {
+        id: `user_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`, // ID único simple
+        email,
+        passwordHash,
+      };
+      users.push(newUser);
+      resolve(newUser);
+    }, 100);
+  });
+}
+
+// Simulación de hash de contraseña (NO USAR EN PRODUCCIÓN)
+// En producción, usa bibliotecas como bcrypt o argon2
+export async function hashPassword(password: string): Promise<string> {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      // Esto es solo una simulación muy básica. NO ES SEGURO.
+      resolve(`hashed_${password}`);
+    }, 50);
+  });
+}
+
+export async function verifyPassword(password: string, hash: string): Promise<boolean> {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      // Esto es solo una simulación muy básica. NO ES SEGURO.
+      resolve(`hashed_${password}` === hash);
+    }, 50);
+  });
+}
