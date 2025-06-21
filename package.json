@@ -11,18 +11,21 @@
     "preview": "astro preview",
     "astro": "astro",
     "test": "vitest",
-    "test:ui": "vitest --ui"
+    "test:ui": "vitest --ui",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@astrojs/vercel": "^8.2.0",
     "@google/genai": "^1.6.0",
     "@tailwindcss/vite": "^4.1.10",
     "@types/marked": "^5.0.2",
+    "@vercel/sdk": "^1.8.5",
     "astro": "^5.10.0",
     "marked": "^15.0.12",
     "tailwindcss": "^4.1.10"
   },
   "devDependencies": {
+    "@playwright/test": "^1.53.1",
     "@types/jsdom": "^21.1.7",
     "@vitest/ui": "^3.2.4",
     "happy-dom": "^18.0.1",
