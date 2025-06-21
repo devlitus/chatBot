@@ -1,6 +1,5 @@
 ---
-// src/components/Login.astro
-
+// Opción alternativa: Procesamiento del lado del servidor
 let error = '';
 
 if (Astro.request.method === 'POST') {
@@ -8,88 +7,67 @@ if (Astro.request.method === 'POST') {
   const email = formData.get('email');
   const password = formData.get('password');
 
-  // Aquí iría la lógica de autenticación
-  // Por ahora, simularemos un error si el email no es "test@example.com"
-  if (email !== 'test@example.com' || password !== 'password') {
-    error = 'Invalid email or password';
+  // Validación simple
+  if (email && password) {
+    // Simular login exitoso
+    console.log('Login successful:', { email, password });
+    // Redirigir a la página principal
+    return Astro.redirect('/');
   } else {
-    // Lógica de éxito, por ejemplo, redirigir o establecer una cookie de sesión
-    // return Astro.redirect('/dashboard'); // Descomentar cuando exista la página de dashboard
-    console.log('Login successful');
+    error = 'Please fill in all fields';
   }
 }
 ---
-<div class="login-container">
-  <h2>Login</h2>
-  {error && <p class="error">{error}</p>}
-  <form method="POST" action="/api/auth/login">
-    <div>
-      <label for="email">Email:</label>
-      <input type="email" id="email" name="email" required />
-    </div>
-    <div>
-      <label for="password">Password:</label>
-      <input type="password" id="password" name="password" required />
-    </div>
-    <button type="submit">Login</button>
-  </form>
-  <p>Don't have an account? <a href="/register">Register here</a></p>
+<div class="flex items-center justify-center min-h-screen">
+  <div class="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md">
+    <h2 class="text-2xl font-bold text-white text-center mb-6">Login</h2>
+    <div id="error-message" class="text-red-400 text-center mb-4 hidden"></div>
+    <div id="success-message" class="text-green-400 text-center mb-4 hidden"></div>
+
+    <form class="space-y-4">
+      <div>
+        <label for="email" class="block text-sm font-medium text-gray-300 mb-2">Email:</label>
+        <input 
+          type="email" 
+          id="email" 
+          name="email" 
+          required 
+          class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        />
+      </div>
+      <div>
+        <label for="password" class="block text-sm font-medium text-gray-300 mb-2">Password:</label>
+        <input 
+          type="password" 
+          id="password" 
+          name="password" 
+          required 
+          class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        />
+      </div>
+      <button 
+        type="submit" 
+        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200"
+      >
+        Login
+      </button>
+    </form>
+    <p class="text-center mt-6 text-gray-300">
+      Don't have an account? 
+      <a href="/register" class="text-blue-400 hover:text-blue-300 transition-colors">Register here</a>
+    </p>
+  </div>
 </div>
 
-<style>
-  .login-container {
-    max-width: 400px;
-    margin: 50px auto;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+<script>
+  const form = document.querySelector('form');
+  const errorMessage = document.getElementById('error-message');
+  const successMessage = document.getElementById('success-message');
+
+  if (form) {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      window.location.href = '/';
+    });
   }
-  h2 {
-    text-align: center;
-    margin-bottom: 20px;
-  }
-  div {
-    margin-bottom: 15px;
-  }
-  label {
-    display: block;
-    margin-bottom: 5px;
-  }
-  input[type="email"],
-  input[type="password"] {
-    width: 100%;
-    padding: 8px;
-    box-sizing: border-box;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  button[type="submit"] {
-    width: 100%;
-    padding: 10px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  button[type="submit"]:hover {
-    background-color: #0056b3;
-  }
-  .error {
-    color: red;
-    text-align: center;
-    margin-bottom: 15px;
-  }
-  p {
-    text-align: center;
-    margin-top: 20px;
-  }
-  a {
-    color: #007bff;
-    text-decoration: none;
-  }
-  a:hover {
-    text-decoration: underline;
-  }
-</style>
+</script>

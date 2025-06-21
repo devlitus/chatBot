@@ -1,11 +1,12 @@
 ---
-// src/pages/login.astro
 import Layout from '../layouts/Layout.astro';
-import Login from '../components/Login.astro';
+import LoginComponent from '../components/Login.astro';
 ---
 
 <Layout title="Login">
-  <main>
-    <Login />
-  </main>
+  <div class="flex justify-center h-screen bg-gray-900 text-white">
+    <div class="w-full max-w-[1200px] flex flex-col h-full">
+      <LoginComponent />
+    </div>
+  </div>
 </Layout>

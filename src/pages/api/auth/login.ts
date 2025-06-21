@@ -3,35 +3,38 @@ import type { APIRoute } from 'astro';
 import { getUserByEmail, verifyPassword } from '../../../utils/db'; // Asumimos que estas funciones existen
 
 export const POST: APIRoute = async ({ request, cookies }) => {
-  const formData = await request.formData();
-  const email = formData.get('email')?.toString();
-  const password = formData.get('password')?.toString();
+  const formData =  request
 
-  if (!email || !password) {
-    return new Response(JSON.stringify({ error: 'Email and password are required' }), { status: 400 });
-  }
+  console.log('request', formData);
+  return new Response(JSON.stringify({ message: 'Login successful' }), { status: 200 });
+  // const email = formData.get('email')?.toString();
+  // const password = formData.get('password')?.toString();
 
-  const user = await getUserByEmail(email);
+  // if (!email || !password) {
+  //   return new Response(JSON.stringify({ error: 'Email and password are required' }), { status: 400 });
+  // }
 
-  if (!user) {
-    return new Response(JSON.stringify({ error: 'Invalid credentials' }), { status: 401 });
-  }
+  // const user = await getUserByEmail(email);
 
-  const isValidPassword = await verifyPassword(password, user.passwordHash);
+  // if (!user) {
+  //   return new Response(JSON.stringify({ error: 'Invalid credentials' }), { status: 401 });
+  // }
 
-  if (!isValidPassword) {
-    return new Response(JSON.stringify({ error: 'Invalid credentials' }), { status: 401 });
-  }
+  // const isValidPassword = await verifyPassword(password, user.passwordHash);
 
-  // Simulación de creación de sesión
-  cookies.set('session_id', user.id, { // Usar user.id o un token de sesión real
-    path: '/',
-    httpOnly: true,
-    secure: import.meta.env.PROD, // Solo HTTPS en producción
-    maxAge: 60 * 60 * 24 * 7 // 1 semana
-  });
+  // if (!isValidPassword) {
+  //   return new Response(JSON.stringify({ error: 'Invalid credentials' }), { status: 401 });
+  // }
 
-  // Redirigir al dashboard o a la página principal después del login
-  // return redirect('/dashboard', 302); // Descomentar cuando exista /dashboard
-  return new Response(JSON.stringify({ message: 'Login successful', userId: user.id }), { status: 200 });
+  // // Simulación de creación de sesión
+  // cookies.set('session_id', user.id, { // Usar user.id o un token de sesión real
+  //   path: '/',
+  //   httpOnly: true,
+  //   secure: import.meta.env.PROD, // Solo HTTPS en producción
+  //   maxAge: 60 * 60 * 24 * 7 // 1 semana
+  // });
+
+  // // Redirigir al dashboard o a la página principal después del login
+  // // return redirect('/dashboard', 302); // Descomentar cuando exista /dashboard
+  // return new Response(JSON.stringify({ message: 'Login successful', userId: user.id }), { status: 200 });
 };
