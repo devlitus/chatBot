@@ -10,7 +10,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "test": "vitest run",
+    "test": "vitest run ",
     "test:ui": "vitest --ui",
     "test:e2e": "playwright test",
     "test:ci": "vitest run --reporter=verbose",
