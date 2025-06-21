@@ -2,9 +2,9 @@ name: Deploy to Vercel
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, master ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main, master ]
 
 jobs:
   test:
@@ -38,7 +38,11 @@ jobs:
   deploy:
     needs: test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+    if: |
+      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop') &&
+      secrets.VERCEL_TOKEN != '' &&
+      secrets.VERCEL_ORG_ID != '' &&
+      secrets.VERCEL_PROJECT_ID != ''
     
     steps:
     - uses: actions/checkout@v4
@@ -63,4 +67,27 @@ jobs:
         vercel-token: ${{ secrets.VERCEL_TOKEN }}
         vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
         vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-        vercel-args: '--prod' 
+        vercel-args: '--prod'
+
+  deploy-skip:
+    needs: test
+    runs-on: ubuntu-latest
+    if: |
+      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop') &&
+      (secrets.VERCEL_TOKEN == '' || secrets.VERCEL_ORG_ID == '' || secrets.VERCEL_PROJECT_ID == '')
+    
+    steps:
+    - name: Skip deployment - Missing Vercel secrets
+      run: |
+        echo "⚠️  Deployment skipped because Vercel secrets are not configured."
+        echo ""
+        echo "To enable automatic deployments, please add the following secrets to your repository:"
+        echo "1. Go to your repository Settings > Secrets and variables > Actions"
+        echo "2. Add the following repository secrets:"
+        echo "   - VERCEL_TOKEN: Your Vercel API token"
+        echo "   - VERCEL_ORG_ID: Your Vercel organization ID"
+        echo "   - VERCEL_PROJECT_ID: Your Vercel project ID"
+        echo ""
+        echo "You can find these values in your Vercel dashboard:"
+        echo "- Token: https://vercel.com/account/tokens"
+        echo "- Org ID & Project ID: https://vercel.com/dashboard" 
