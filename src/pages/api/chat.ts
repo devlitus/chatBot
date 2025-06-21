@@ -1,11 +1,13 @@
 import { GoogleGenAI } from "@google/genai";
-import { z } from "zod";
+import {GEMINI_API_KEY} from "astro:env/server";
+ 
+
 export const prerender = false;
 export const POST = async ({ request }: { request: Request }) => {
   const body = await request.json();
   const { message } = body;
   const genai = new GoogleGenAI({
-    apiKey: 'AIzaSyCqjFQlOp6RJrrZYZCHUo983cevWp0FAwU',
+    apiKey: GEMINI_API_KEY,
   });  
   const response = await genai.models.generateContent({
     model: "gemini-2.5-flash",
