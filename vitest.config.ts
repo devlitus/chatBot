@@ -8,4 +8,9 @@ export default defineConfig({
     includeSource: ['src/**/*.{js,ts,jsx,tsx}'], // enable in-source testing
     setupFiles: ['tests/setup.ts'], // <--- Add this line
   },
+  resolve: {
+    alias: {
+      'astro:env/server': 'tests/mocks/astro-env.js'
+    }
+  }
 });
